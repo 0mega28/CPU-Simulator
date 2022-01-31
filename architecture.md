@@ -10,6 +10,7 @@
 
 -   Memory size = 2<sup>16</sup> = 65536 bytes
 
+-	Memory layout is Big Endian
 ## Instruction set
 
 | Instruction       | Result                        |
