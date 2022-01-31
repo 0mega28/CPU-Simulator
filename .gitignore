@@ -1,6 +1,9 @@
 # VS Code Metadata
 .vscode/
 
+# Generated bin file
+*.bin
+
 # Prerequisites
 *.d
 
