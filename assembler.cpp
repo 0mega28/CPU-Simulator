@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 #include <string>
 #include <vector>
@@ -117,6 +118,132 @@ void label_parser() {
 	}
 }
 
+/* Parses string of type R0[R1] and assigns value rs = R0 & rt = R1 */
+void ld_st_operand_parser(std::string operand, std::string &rs, std::string &rt) {
+	std::vector<std::string> operand_list;
+	boost::split(operand_list, operand, boost::is_any_of("["));
+
+	rs = operand_list[0];
+	rt = operand_list[1].substr(0, operand_list[1].length() - 1);
+}
+
+std::string gen_bin_from_instr(std::string operand, std::string rd, std::string rs, std::string rt) {
+	std::string opcode = opcode_map[operand];
+	std::string rd_bin = register_map[rd];
+	std::string rs_bin = register_map[rs];
+	std::string rt_bin = register_map[rt];
+
+	return opcode + rd_bin + rs_bin + rt_bin;
+}
+
+std::string gen_bin_from_instr(std::string operand, std::string rd, std::string rs, int imme) {
+	std::string opcode = opcode_map[operand];
+	std::string rd_bin = register_map[rd];
+	std::string rs_bin = register_map[rs];
+	std::string imme_bin = int_to_bin(4, imme);
+
+	return opcode + rd_bin + rs_bin + imme_bin;
+}
+
+void translate(std::string bin_file) {
+	std::ofstream bin_strm;
+	bin_strm.open(bin_file);
+
+	for (int ip = 0; ip < instr_list.size(); ip++) {
+		std::string instr = instr_list[ip];
+		std::string opcode;
+		std::string bin_out = "";
+
+		std::stringstream ss(instr);
+
+		ss >> opcode;
+
+		if (opcode == "ADD" || opcode == "SUB" || opcode == "MUL") {
+			/* This if case handles operant: 
+			 * ADD, ADDI
+			 * SUB, SUBI
+			 * MUL, MULI
+			 */
+			if (instr.find("#") != std::string::npos) {
+				/* Instruction contains immediate value */
+				/* ADDI R1 R2 #4 */
+				std::string rd, rs, imm;
+				ss >> rd;
+				ss >> rs;
+				ss >> imm;
+				opcode += "I"; /* Since it's an immediate value instruction */
+
+				int imm_val = std::stoi(imm.substr(1));
+
+				bin_out = gen_bin_from_instr(opcode, rd, rs, imm_val);
+			} else {
+				/* Instruction doesn't contain immediate value */
+				/* ADD R1 R2 R3 */
+				std::string rd, rs, rt;
+				ss >> rd;
+				ss >> rs;
+				ss >> rt;
+
+				bin_out = gen_bin_from_instr(opcode, rd, rs, rt);
+			}
+		} else if (opcode == "LD") {
+			/* LD R1 R0[R2] */
+			std::string rd, rs, rt;
+			ss >> rd;
+
+			std::string ld_operand;
+			ss >> ld_operand;
+
+			ld_st_operand_parser(ld_operand, rs, rt);
+
+			bin_out = gen_bin_from_instr(opcode, rd, rs, rt);
+		} else if (opcode == "ST") {
+			/* ST R0[R1] R2 */
+			std::string rd, rs, rt;
+
+			std::string st_operand;
+			ss >> st_operand;
+
+			ss >> rt;
+
+			ld_st_operand_parser(st_operand, rd, rs);
+
+			bin_out = gen_bin_from_instr(opcode, rd, rs, rt);
+		} else if (opcode == "JMP") {
+			/* JMP label */
+			std::string label;
+			ss >> label;
+
+			int label_pos = label_map[label];
+			int curr_pos = ip * (CPU_ARCH / 8);
+
+			int offset = label_pos - curr_pos;
+
+			bin_out = opcode_map[opcode] + int_to_bin(12, offset);
+		} else if (opcode == "BEQZ") {
+			/* BEQZ R1 label */
+			std::string rd, label;
+			ss >> rd;
+			ss >> label;
+
+			int label_pos = label_map[label];
+			int curr_pos = ip * (CPU_ARCH / 8);
+
+			int offset = label_pos - curr_pos;
+
+			bin_out = opcode_map[opcode] + register_map[rd] + int_to_bin(8, offset);
+		} else if (opcode == "HLT") {
+			/* HLT */
+			bin_out = opcode_map[opcode];
+			bin_out += "000000000000";	/* padding */
+		}
+
+		bin_strm << bin_out << std::endl;
+	}
+
+	bin_strm.close();
+}
+
 void dump_instr_list() {
 	for (int ip = 0; ip < instr_list.size(); ip++)
 		std::cout << (ip * 2) << "\t" << instr_list[ip] << std::endl;
@@ -142,6 +269,7 @@ int main(int argc, char **argv)
 	initialise();
 	parse_asm_file(asm_file);
 	label_parser();
+	translate(bin_file);
 
 	dump_instr_list();
 	dump_labels();
