@@ -1,5 +1,5 @@
 CC=g++
-
+CFLAGS=-g
 assembler: assembler.cpp
 	${CC} ${CFLAGS} -o $@ $^
 
