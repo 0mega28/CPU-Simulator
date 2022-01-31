@@ -7,7 +7,7 @@ factorial:
 BEQZ R1 exit
 MUL R2 R2 R1
 SUB R1 R1 #1
-JUMP factorial
+JMP factorial
 
 exit:
 HLT

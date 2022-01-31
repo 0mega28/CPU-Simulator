@@ -18,7 +18,7 @@ ADD R3 R0 R4
 ADD R4 R0 R5
 ST R0[R2] R4
 ADD R2 R2 #2
-JUMP fibonacci
+JMP fibonacci
 
 exit:
 HLT
