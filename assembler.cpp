@@ -127,7 +127,9 @@ void ld_st_operand_parser(std::string operand, std::string &rs, std::string &rt)
 	rt = operand_list[1].substr(0, operand_list[1].length() - 1);
 }
 
-std::string gen_bin_from_instr(std::string operand, std::string rd, std::string rs, std::string rt) {
+std::string gen_bin_from_instr(std::string operand, std::string rd,
+			       std::string rs, std::string rt)
+{
 	std::string opcode = opcode_map[operand];
 	std::string rd_bin = register_map[rd];
 	std::string rs_bin = register_map[rs];
@@ -136,7 +138,9 @@ std::string gen_bin_from_instr(std::string operand, std::string rd, std::string 
 	return opcode + rd_bin + rs_bin + rt_bin;
 }
 
-std::string gen_bin_from_instr(std::string operand, std::string rd, std::string rs, int imme) {
+std::string gen_bin_from_instr(std::string operand, std::string rd,
+			       std::string rs, int imme)
+{
 	std::string opcode = opcode_map[operand];
 	std::string rd_bin = register_map[rd];
 	std::string rs_bin = register_map[rs];
@@ -171,11 +175,13 @@ void translate(std::string bin_file) {
 				ss >> rd;
 				ss >> rs;
 				ss >> imm;
-				opcode += "I"; /* Since it's an immediate value instruction */
+				/* Since it's an immediate value instruction */
+				opcode += "I";
 
 				int imm_val = std::stoi(imm.substr(1));
 
-				bin_out = gen_bin_from_instr(opcode, rd, rs, imm_val);
+				bin_out = gen_bin_from_instr(opcode, rd,
+							     rs, imm_val);
 			} else {
 				/* Instruction doesn't contain immediate value */
 				/* ADD R1 R2 R3 */
@@ -231,11 +237,13 @@ void translate(std::string bin_file) {
 
 			int offset = label_pos - curr_pos;
 
-			bin_out = opcode_map[opcode] + register_map[rd] + int_to_bin(8, offset);
+			bin_out = opcode_map[opcode] + register_map[rd] +
+				  int_to_bin(8, offset);
 		} else if (opcode == "HLT") {
 			/* HLT */
 			bin_out = opcode_map[opcode];
-			bin_out += "000000000000";	/* padding */
+			/* padding */
+			bin_out += "000000000000";
 		}
 
 		bin_strm << bin_out << std::endl;
@@ -257,7 +265,8 @@ void dump_labels() {
 int main(int argc, char **argv)
 {
 	if (argc != 2) {
-		std::cerr << "Usage: " << argv[0] << " <input file>" << std::endl;
+		std::cerr << "Usage: " << argv[0] <<
+			     " <input file>" << std::endl;
 		return 1;
 	}
 
