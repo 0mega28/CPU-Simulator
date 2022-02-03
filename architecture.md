@@ -1,6 +1,8 @@
 # CPU Architecture
 
--   Number of registers = 16 _i.e._, `R0 R1 ... R15`
+-   Registers
+	- General Purpose Registers = 16 _i.e._, `R0 R1 ... R15`
+	- Special Purpose Register Accumulator `AX`
 
 -   Size of registers = 16 bits
 
@@ -19,8 +21,10 @@
 | `SUB R1, R2, R3 ` | `R1 = R2 - R3 `               |
 | `MUL R1, R2, R3 ` | `R1 = R2 * R3 `               |
 | `ADD R1, R0, #5 ` | `assigns R1 = 5 `             |
-| `LD R1, A[R1] `   | `R1= [R1+A] `                 |
+| `LD R1, A[R1] `   | `R1 = [R1+A] `                 |
 | `ST A[R1], R1 `   | `[R1+A] = R1 `                |
+| `LAX #512 `       | `assigns AX = 512 `           |
+| `STX R2 `         | `R2 = AX `                    |
 | `JMP L1 `         | `Jump to L1 label `           |
 | `BEQZ R1, L1 `    | `Jump to L1 label if R1 = 0` |
 | `HLT `            | `Halt the computation `       |
