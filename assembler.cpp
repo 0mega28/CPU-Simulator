@@ -88,6 +88,7 @@ void initialise()
 	opcode_map["JMP"] = "1000";
 	opcode_map["BEQZ"] = "1001";
 	opcode_map["HLT"] = "1010";
+	opcode_map["LAX"] = "1011";
 }
 
 /*
@@ -215,6 +216,27 @@ void translate(std::string bin_file) {
 			ld_st_operand_parser(st_operand, rd, rs);
 
 			bin_out = gen_bin_from_instr(opcode, rd, rs, rt);
+		}
+		/*
+		 * To load a location as an immediate value, utilise the
+		 * instruction 'LAX' i.e., 'Load into Accumulator'. This
+		 * is an implicit computation using a special register
+		 * called the Accumulator (AX) otherwise inaccessible to
+		 * the user. Now, locations as big as 12-bits in length
+		 * can be loaded.
+		 *
+		 * For instance,
+		 *      LAX #512
+		 */
+		else if (opcode == "LAX") {
+			if (instr.find("#") != std::string::npos) {
+				std::string imm;
+				ss >> imm;
+
+				int imm_val = std::stoi(imm.substr(1));
+				bin_out = opcode_map[opcode] +
+					  int_to_bin(12, imm_val);
+			}
 		} else if (opcode == "JMP") {
 			/* JMP label */
 			std::string label;
