@@ -32,21 +32,20 @@
 #define NUM_REGS 16
 #define CPU_ARCH 16
 
-/* mapping of label and address */
+/* Mapping of label and address */
 static std::unordered_map<std::string, int> label_map;
 
-/* mapping of operator and opcode */
+/* Mapping of operator and opcode */
 static std::unordered_map<std::string, std::string> opcode_map;
 
-/* mapping of register and index */
+/* Mapping of register and index */
 static std::unordered_map<std::string, std::string> register_map;
 
-/* list of assembly program's line-by-line instructions */
+/* List of assembly program's line-by-line instructions */
 static std::vector<std::string> instr_list;
 
 /* Returns binary string of an interger value */
-std::string int_to_bin(int bits, int value)
-{
+std::string int_to_bin(int bits, int value) {
 	std::bitset<CPU_ARCH> bin(value);
 	return bin.to_string().substr(CPU_ARCH - bits);
 }
@@ -57,10 +56,10 @@ void parse_asm_file(std::string asm_f) {
 
 	std::string line;
 	while (std::getline(asm_str, line)) {
-		/* trim leading and trailing whitespaces */
+		/* Trim leading and trailing whitespaces */
 		boost::algorithm::trim(line);
 
-		/* skip empty lines and comments */
+		/* Skip empty lines and comments */
 		if (line.length() == 0 || line[0] == ';')
 			continue;
 
@@ -68,15 +67,14 @@ void parse_asm_file(std::string asm_f) {
 	}
 }
 
-void initialise()
-{
-	/* map register to index */
+void initialise() {
+	/* Map register to index */
 	for (int i = 0; i < NUM_REGS; i++) {
 		std::string reg_name = "R" + std::to_string(i);
 		register_map[reg_name] = int_to_bin(4, i);
 	}
 
-	/* map operator to opcode */
+	/* Map operator to opcode */
 	opcode_map["ADD"] = "0000";
 	opcode_map["ADDI"] = "0001";
 	opcode_map["SUB"] = "0010";
@@ -113,7 +111,7 @@ void label_parser() {
 			 */
 			label_map[label] = ip * (CPU_ARCH / 8);
 
-			/* purge label name(s) from the instruction list */
+			/* Purge label name(s) from the instruction list */
 			instr_list.erase(instr_list.begin() + ip);
 			ip--;
 		}
@@ -129,6 +127,10 @@ void ld_st_operand_parser(std::string operand, std::string &rs, std::string &rt)
 	rt = operand_list[1].substr(0, operand_list[1].length() - 1);
 }
 
+/*
+ * Generate the binary of an instruction containing one
+ * opcode and three registers
+ */
 std::string gen_bin_from_instr(std::string operand, std::string rd,
 			       std::string rs, std::string rt)
 {
@@ -140,6 +142,10 @@ std::string gen_bin_from_instr(std::string operand, std::string rd,
 	return opcode + rd_bin + rs_bin + rt_bin;
 }
 
+/*
+ * Generate the binary of an instruction containing one
+ * opcode, two registers and an immediate value.
+ */
 std::string gen_bin_from_instr(std::string operand, std::string rd,
 			       std::string rs, int imme)
 {
@@ -151,6 +157,7 @@ std::string gen_bin_from_instr(std::string operand, std::string rd,
 	return opcode + rd_bin + rs_bin + imme_bin;
 }
 
+/* Conversion into opcode takes place */
 void translate(std::string bin_file) {
 	std::ofstream bin_strm;
 	bin_strm.open(bin_file);
@@ -164,15 +171,15 @@ void translate(std::string bin_file) {
 
 		ss >> opcode;
 
+		/* For the operators 'ADD', 'MUL' and 'SUB' */
 		if (opcode == "ADD" || opcode == "SUB" || opcode == "MUL") {
-			/* This if case handles operant: 
-			 * ADD, ADDI
-			 * SUB, SUBI
-			 * MUL, MULI
-			 */
+			/* handling operators: 'ADDI', 'SUBI' and 'MULI' */
 			if (instr.find("#") != std::string::npos) {
-				/* Instruction contains immediate value */
-				/* ADDI R1 R2 #4 */
+				/*
+				 * Instruction contains immediate value
+				 * For instance,
+				 *      ADDI R1 R2 #4
+				 */
 				std::string rd, rs, imm;
 				ss >> rd;
 				ss >> rs;
@@ -185,8 +192,11 @@ void translate(std::string bin_file) {
 				bin_out = gen_bin_from_instr(opcode, rd,
 							     rs, imm_val);
 			} else {
-				/* Instruction doesn't contain immediate value */
-				/* ADD R1 R2 R3 */
+				/*
+				 * Instruction doesn't contain immediate value
+				 * For instance,
+				 *      ADD R1 R2 R3
+				 */
 				std::string rd, rs, rt;
 				ss >> rd;
 				ss >> rs;
@@ -194,8 +204,12 @@ void translate(std::string bin_file) {
 
 				bin_out = gen_bin_from_instr(opcode, rd, rs, rt);
 			}
-		} else if (opcode == "LD") {
-			/* LD R1 R0[R2] */
+		}
+		/* For an 'LD' instruction */
+		else if (opcode == "LD") {
+			/* For instance,
+			 *      LD R1 R0[R2]
+			 */
 			std::string rd, rs, rt;
 			ss >> rd;
 
@@ -205,8 +219,12 @@ void translate(std::string bin_file) {
 			ld_st_operand_parser(ld_operand, rs, rt);
 
 			bin_out = gen_bin_from_instr(opcode, rd, rs, rt);
-		} else if (opcode == "ST") {
-			/* ST R0[R1] R2 */
+		}
+		/* For an 'ST' instruction */
+		else if (opcode == "ST") {
+			/* For instance,
+			 *      ST R0[R1] R2
+			 */
 			std::string rd, rs, rt;
 
 			std::string st_operand;
@@ -249,11 +267,15 @@ void translate(std::string bin_file) {
 		else if (opcode == "STX") {
 			std::string rs;
 			ss >> rs;
-			/* padded for a 16-bit instruction length */
+			/* Padded for a 16-bit instruction length */
 			std::string padded_rs = "00000000" + register_map[rs];
 			bin_out = opcode_map[opcode] + padded_rs;
-		} else if (opcode == "JMP") {
-			/* JMP label */
+		}
+		/* For a 'JMP' instruction */
+		else if (opcode == "JMP") {
+			/* For instance,
+			 *      JMP label
+			 */
 			std::string label;
 			ss >> label;
 
@@ -263,8 +285,12 @@ void translate(std::string bin_file) {
 			int offset = label_pos - curr_pos;
 
 			bin_out = opcode_map[opcode] + int_to_bin(12, offset);
-		} else if (opcode == "BEQZ") {
-			/* BEQZ R1 label */
+		}
+		/* Branch to a label if a register is equal to zero */
+		else if (opcode == "BEQZ") {
+			/* For instance,
+			 *      BEQZ R1 label
+			 */
 			std::string rd, label;
 			ss >> rd;
 			ss >> label;
@@ -276,10 +302,12 @@ void translate(std::string bin_file) {
 
 			bin_out = opcode_map[opcode] + register_map[rd] +
 				  int_to_bin(8, offset);
-		} else if (opcode == "HLT") {
+		}
+		/* Stop the assembly program */
+		else if (opcode == "HLT") {
 			/* HLT */
 			bin_out = opcode_map[opcode];
-			/* padding */
+			/* Padded for a 16-bit instruction length */
 			bin_out += "000000000000";
 		}
 
@@ -299,8 +327,7 @@ void dump_labels() {
 		std::cout << labels.first << "\t" << labels.second << std::endl;
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
 	if (argc != 2) {
 		std::cerr << "Usage: " << argv[0] <<
 			     " <input file>" << std::endl;
