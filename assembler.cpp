@@ -89,6 +89,7 @@ void initialise()
 	opcode_map["BEQZ"] = "1001";
 	opcode_map["HLT"] = "1010";
 	opcode_map["LAX"] = "1011";
+	opcode_map["STX"] = "1100";
 }
 
 /*
@@ -237,6 +238,20 @@ void translate(std::string bin_file) {
 				bin_out = opcode_map[opcode] +
 					  int_to_bin(12, imm_val);
 			}
+		}
+		/* To store a value from the accumulator into a register,
+		 * utilise the intruction 'STX' i.e., 'Store from
+		 * Accumulator into Register'.
+		 *
+		 * For instance,
+		 *      STX R2
+		 */
+		else if (opcode == "STX") {
+			std::string rs;
+			ss >> rs;
+			/* padded for a 16-bit instruction length */
+			std::string padded_rs = "00000000" + register_map[rs];
+			bin_out = opcode_map[opcode] + padded_rs;
 		} else if (opcode == "JMP") {
 			/* JMP label */
 			std::string label;
