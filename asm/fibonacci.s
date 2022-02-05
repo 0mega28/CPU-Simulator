@@ -1,7 +1,8 @@
 ; Calculate and store first n (stored in R1) Fibonacci numbers at memory location m (stored in R2)
 ADD R1 R0 #10
 
-ADD R2 R0 #512
+LAX #512
+STX R2
 
 ADD R3 R0 R0
 ADD R4 R0 #1
