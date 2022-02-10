@@ -36,7 +36,3 @@
 *.exe
 *.out
 *.app
-
-# Assembler executable
-assembler
-
