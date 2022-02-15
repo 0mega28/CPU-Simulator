@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-g
+CFLAGS=-g -Wall -Werror
 assembler: assembler.cpp
 	${CC} ${CFLAGS} -o $@ $^
 
