@@ -55,6 +55,7 @@ public:
 
 	void dumpMemory()
 	{
+		std::cout << "Instruction Memory: " << std::endl;
 		for (int i = 0; i < totalInstructions; i++)
 		{
 			Instruction *instr = instructionCache[i];

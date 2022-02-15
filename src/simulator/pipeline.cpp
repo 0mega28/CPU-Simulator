@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <iostream>
 
 #include "Fetch.hpp"
 #include "Decode.hpp"
@@ -29,6 +29,7 @@ void initialize(std::string binFile)
 
 void cycle()
 {
+	std::cout << "\nCPU Cycle: " << CPUclock << std::endl;
 	// retire->cycle();
 	// execute->cycle();
 	decode->cycle();
@@ -41,13 +42,23 @@ int main(int argc, char **argv)
 {
 	if (argc != 2)
 	{
-		printf("%s %s %s\n", "Usage", argv[0], "filename");
+		std::cout << "Usage: " << argv[0] << " < binary file>" << std::endl;
 		exit(1);
 	}
 
+	std::cout << "Starting Simulator" << std::endl;
+
 	initialize(argv[1]);
+
+	while (1)
+		cycle();
+
+	std::cout << std::endl;
+
 	instructionMemory->dumpMemory();
-	cycle();
+	RegSet::dumpRegisters();
+
+	std::cout << "Simulation Complete" << std::endl;
 
 	return 0;
 }

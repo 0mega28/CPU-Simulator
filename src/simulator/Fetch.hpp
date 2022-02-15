@@ -21,6 +21,8 @@ Fetch::Fetch(InstructionMemory *instructionMemory)
 
 void Fetch::cycle()
 {
+	std::cout << "Fetch: " << std::endl;
+
 	/* Fetch instruction from instruction memory */
 	Instruction *i = instructionMemory->getInstruction(RegSet::pc);
 
@@ -30,4 +32,6 @@ void Fetch::cycle()
 
 	/* Increment program counter */
 	RegSet::pc++;
+
+	i->dumpInstruction();
 }

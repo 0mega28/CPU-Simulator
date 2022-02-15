@@ -100,5 +100,5 @@ Instruction::Instruction(std::string binaryInstruction)
 
 void Instruction::dumpInstruction()
 {
-	std::cout << "OPCODE: " << opcode << "OP1: " << op1 << "OP2: " << op2 << "OP3: " << op3 << std::endl;
+	std::cout << "OPCODE: " << opcode << " OP1: " << op1 << " OP2: " << op2 << " OP3: " << op3 << std::endl;
 }

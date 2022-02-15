@@ -52,16 +52,23 @@ int RegSet::ir3 = 0;
 void RegSet::dumpRegisters()
 {
 	using namespace std;
-	cout << "PC: " << RegSet::pc << endl;
-	cout << "IP: " << RegSet::ip.i << endl;
+	cout << "Registers: " << endl;
+	cout << "\nPC: " << RegSet::pc << endl;
+	cout << "\nIP: ";
+	ip.i->dumpInstruction();
 
+	cout << "\nGeneral Purpose Registers" << endl;
 	for (int i = 0; i < 16; i++)
 	{
-		cout << "R" << i << ": " << RegSet::gpr[i] << endl;
+		cout << "R" << i << ": " << RegSet::gpr[i] << '\t';
+
+		if ((i + 1) % 4 == 0)
+			cout << endl;
 	}
 
-	cout << "CR: " << RegSet::cr.value << endl;
-	cout << "IR1: " << RegSet::ir1 << endl;
-	cout << "IR2: " << RegSet::ir2 << endl;
+	cout << "\nIntermediate Registers" << endl;
+	cout << "CR: " << RegSet::cr.value << '\t';
+	cout << "IR1: " << RegSet::ir1 << '\t';
+	cout << "IR2: " << RegSet::ir2 << '\t';
 	cout << "IR3: " << RegSet::ir3 << endl;
 }

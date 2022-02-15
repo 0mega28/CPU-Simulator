@@ -69,4 +69,7 @@ void Decode::cycle()
 		exit(EXIT_FAILURE);
 		break;
 	}
+
+	std::cout << "Decode: " << std::endl;
+	std::cout << "OP1: " << RegSet::ir1 << " OP2: " << RegSet::ir2 << " OP3: " << RegSet::ir3 << std::endl;
 }
