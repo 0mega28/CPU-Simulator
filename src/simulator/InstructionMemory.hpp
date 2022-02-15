@@ -58,7 +58,8 @@ public:
 		for (int i = 0; i < totalInstructions; i++)
 		{
 			Instruction *instr = instructionCache[i];
-			std::cout << "opcode " << instr->getOpcode() << "\too " << instr->getOutputOperand() << "\tio1 " << instr->getInputOperand1() << "\tio2 " << instr->getInputOperand2() << std::endl;
+			std::cout << "OPCODE " << instr->getOpcode() << "\tO1 " << instr->getop1() << "\tO2 "
+				  << instr->getop2() << "\tO3 " << instr->getop3() << std::endl;
 		}
 	}
 };
