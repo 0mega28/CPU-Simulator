@@ -1,8 +1,11 @@
+#pragma once
+
 #include "Instruction.hpp"
 #include <string>
 #include <fstream>
 #include <vector>
 #include <iostream>
+#include <assert.h>
 
 class InstructionMemory
 {
@@ -19,6 +22,14 @@ public:
 
 		std::fstream newfile;
 		newfile.open(filename, std::fstream::in);
+
+		/* Check if file opened properly */
+		if (!newfile.is_open())
+		{
+			std::cout << "Error opening file: " << filename << std::endl;
+			exit(1);
+		}
+
 		std::string binaryInstruction;
 		while (getline(newfile, binaryInstruction))
 		{
@@ -38,6 +49,7 @@ public:
 
 	Instruction *getInstruction(int programCounter)
 	{
+		assert(programCounter < totalInstructions);
 		return instructionCache[programCounter];
 	}
 
