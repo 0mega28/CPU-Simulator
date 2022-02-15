@@ -94,14 +94,17 @@ void initialise() {
  * Find the byte of the label and purge the label from the
  * instruction list.
  */
-void label_parser() {
-	for (int ip = 0; ip < instr_list.size(); ip++) {
+void label_parser()
+{
+	for (size_t ip = 0; ip < instr_list.size(); ip++)
+	{
 		std::string instr = instr_list[ip];
 		std::string label;
 
 		/* parse label */
-		int label_index = instr.find(":");
-		if (label_index != std::string::npos) {
+		size_t label_index = instr.find(":");
+		if (label_index != std::string::npos)
+		{
 			label = instr.substr(0, label_index);
 
 			/*
@@ -162,7 +165,8 @@ void translate(std::string bin_file) {
 	std::ofstream bin_strm;
 	bin_strm.open(bin_file);
 
-	for (int ip = 0; ip < instr_list.size(); ip++) {
+	for (size_t ip = 0; ip < instr_list.size(); ip++)
+	{
 		std::string instr = instr_list[ip];
 		std::string opcode;
 		std::string bin_out = "";
@@ -317,8 +321,9 @@ void translate(std::string bin_file) {
 	bin_strm.close();
 }
 
-void dump_instr_list() {
-	for (int ip = 0; ip < instr_list.size(); ip++)
+void dump_instr_list()
+{
+	for (size_t ip = 0; ip < instr_list.size(); ip++)
 		std::cout << (ip * 2) << "\t" << instr_list[ip] << std::endl;
 }
 
