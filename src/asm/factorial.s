@@ -1,5 +1,6 @@
 ; R1 stores the number to find factorial of
-ADD R1 R0 #10
+LAX #10
+STX R1
 
 ; R2 stores the output of factorial function
 ADD R2 R0 #1
