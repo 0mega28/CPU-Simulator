@@ -23,7 +23,7 @@ void Decode::cycle()
 
 	RegSet::cr.value = i->getOpcode();
 	RegSet::cr.valid = true;
-	
+
 	/* Decode instruction and store in intermediate registers */
 	switch (RegSet::cr.value)
 	{
@@ -51,9 +51,13 @@ void Decode::cycle()
 		break;
 
 	case op_enum::LAX:
-	case op_enum::STX:
 	case op_enum::JMP:
 		RegSet::ir1 = i->getop1();
+		break;
+
+	case op_enum::STX:
+		RegSet::ir1 = i->getop1();
+		RegSet::ir2 = RegSet::gpr[16];
 		break;
 
 	case op_enum::BEQZ:
@@ -70,6 +74,8 @@ void Decode::cycle()
 		break;
 	}
 
+#ifdef DECODE_LOG
 	std::cout << "Decode: " << std::endl;
-	std::cout << "OP1: " << RegSet::ir1 << " OP2: " << RegSet::ir2 << " OP3: " << RegSet::ir3 << std::endl;
+	std::cout << "CR: " << op_string[RegSet::cr.value] << "\tIR1: " << RegSet::ir1 << "\tIR2: " << RegSet::ir2 << "\tIR3: " << RegSet::ir3 << std::endl;
+#endif
 }

@@ -67,7 +67,7 @@ Instruction::Instruction(std::string binaryInstruction)
 
 	else if (operationCode == op_enum::STX)
 	{
-		op1 = bin_to_int(binaryInstruction.substr(4, 4), false);
+		op1 = bin_to_int(binaryInstruction.substr(12, 4), false);
 		this->op1 = op1;
 	}
 
@@ -100,5 +100,5 @@ Instruction::Instruction(std::string binaryInstruction)
 
 void Instruction::dumpInstruction()
 {
-	std::cout << "OPCODE: " << opcode << " OP1: " << op1 << " OP2: " << op2 << " OP3: " << op3 << std::endl;
+	std::cout << "OPCODE: " << op_string[opcode] << "\tOP1: " << op1 << "\tOP2: " << op2 << "\tOP3: " << op3 << std::endl;
 }

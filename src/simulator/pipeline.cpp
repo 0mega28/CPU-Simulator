@@ -1,12 +1,13 @@
 #include <iostream>
+#include <setjmp.h>
 
 #include "Fetch.hpp"
 #include "Decode.hpp"
 #include "Execute.hpp"
 #include "Retire.hpp"
 #include "Register.hpp"
-
 #include "InstructionMemory.hpp"
+#include "../utils.hpp"
 
 Fetch *fetch;
 Decode *decode;
@@ -15,7 +16,7 @@ Retire *retire;
 
 InstructionMemory *instructionMemory;
 
-unsigned int CPUclock = 0;
+unsigned int CPUclock = 1;
 
 void initialize(std::string binFile)
 {
@@ -31,7 +32,7 @@ void cycle()
 {
 	std::cout << "\nCPU Cycle: " << CPUclock << std::endl;
 	// retire->cycle();
-	// execute->cycle();
+	execute->cycle();
 	decode->cycle();
 	fetch->cycle();
 
@@ -49,8 +50,9 @@ int main(int argc, char **argv)
 	std::cout << "Starting Simulator" << std::endl;
 
 	initialize(argv[1]);
+	instructionMemory->dumpMemory();
 
-	while (1)
+	while (!setjmp(halt_cpu))
 		cycle();
 
 	std::cout << std::endl;

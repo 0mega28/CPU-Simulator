@@ -7,6 +7,8 @@
 #include <iostream>
 #include <assert.h>
 
+#include "../utils.hpp"
+
 class InstructionMemory
 {
 private:
@@ -59,7 +61,7 @@ public:
 		for (int i = 0; i < totalInstructions; i++)
 		{
 			Instruction *instr = instructionCache[i];
-			std::cout << "OPCODE " << instr->getOpcode() << "\tO1 " << instr->getop1() << "\tO2 "
+			std::cout << "OPCODE " << op_string[instr->getOpcode()] << "\tO1 " << instr->getop1() << "\tO2 "
 				  << instr->getop2() << "\tO3 " << instr->getop3() << std::endl;
 		}
 	}
