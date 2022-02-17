@@ -25,11 +25,11 @@ struct destinationReg
 class RegSet
 {
 public:
-	static int pc;
-	static instructionPointer ip;
+	inline static int pc = 0;
+	inline static instructionPointer ip = {0};
 
 	/* 16 General Purpose Registers and 17th ax register for (LAX and STX) */
-	static int gpr[17];
+	inline static int gpr[17] = {0};
 
 	/*
 	 * Control and intermediate registers values
@@ -38,10 +38,10 @@ public:
 	 * ir1 will store the destination register (if any used)
 	 * ir1 and ir2 will store the source registers (values)
 	 */
-	static intermReg cr;
-	static int ir1;
-	static int ir2;
-	static int ir3;
+	inline static intermReg cr = {0};
+	inline static int ir1 = 0;
+	inline static int ir2 = 0;
+	inline static int ir3 = 0;
 
 	/*
 	 * aluout stores result calculated by ALU
@@ -50,26 +50,12 @@ public:
 	 * true if the instruction is JMP
 	 * dr stores the destination (register or address)
 	 */
-	static intermReg aluout;
-	static bool bt;
-	static destinationReg dr;
+	inline static intermReg aluout = {0};
+	inline static bool bt = false;
+	inline static destinationReg dr = {0};
 
 	static void dumpRegisters();
 };
-
-int RegSet::pc = 0;
-instructionPointer RegSet::ip = {0};
-
-int RegSet::gpr[17] = {0};
-
-intermReg RegSet::cr = {0};
-int RegSet::ir1 = 0;
-int RegSet::ir2 = 0;
-int RegSet::ir3 = 0;
-
-intermReg RegSet::aluout = {0};
-bool RegSet::bt = false;
-destinationReg RegSet::dr = {0};
 
 void RegSet::dumpRegisters()
 {
