@@ -7,6 +7,7 @@
 #include "Retire.hpp"
 #include "Register.hpp"
 #include "InstructionMemory.hpp"
+#include "DataMemory.hpp"
 #include "../utils.hpp"
 
 Fetch *fetch;
@@ -15,12 +16,14 @@ Execute *execute;
 Retire *retire;
 
 InstructionMemory *instructionMemory;
+DataMemory *dataMemory;
 
 unsigned int CPUclock = 1;
 
 void initialize(std::string binFile)
 {
 	instructionMemory = new InstructionMemory(binFile);
+	dataMemory = new DataMemory();
 
 	fetch = new Fetch(instructionMemory);
 	decode = new Decode();
@@ -31,6 +34,7 @@ void initialize(std::string binFile)
 void cycle()
 {
 	std::cout << "\nCPU Cycle: " << CPUclock << std::endl;
+
 	// retire->cycle();
 	execute->cycle();
 	decode->cycle();
@@ -57,7 +61,7 @@ int main(int argc, char **argv)
 
 	std::cout << std::endl;
 
-	instructionMemory->dumpMemory();
+	dataMemory->dumpMemory();
 	RegSet::dumpRegisters();
 
 	std::cout << "Simulation Complete" << std::endl;
