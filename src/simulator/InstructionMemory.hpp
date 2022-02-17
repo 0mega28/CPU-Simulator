@@ -51,8 +51,11 @@ public:
 
 	Instruction *getInstruction(int programCounter)
 	{
-		assert(programCounter < totalInstructions);
-		return instructionCache[programCounter];
+		if (programCounter < instructionCacheSize)
+			return instructionCache[programCounter];
+
+		else
+			return NULL;
 	}
 
 	void dumpMemory()

@@ -25,9 +25,18 @@ void Fetch::cycle()
 	/* Fetch instruction from instruction memory */
 	Instruction *i = instructionMemory->getInstruction(RegSet::pc);
 
-	/* Update instruction pointer */
-	RegSet::ip.i = i;
-	RegSet::ip.valid = true;
+	if (i)
+	{
+		/* Update instruction pointer */
+		RegSet::ip.i = i;
+		RegSet::ip.valid = true;
+	}
+	else
+	{
+		/* Invalid instruction */
+		RegSet::ip.valid = false;
+		return;
+	}
 
 	/* Increment program counter */
 	RegSet::pc++;
