@@ -43,6 +43,18 @@ void cycle()
 	CPUclock++;
 }
 
+void clean_memory()
+{
+	/* Gracefully clean all the memory allocated by the program */
+	delete instructionMemory;
+	delete dataMemory;
+
+	delete fetch;
+	delete decode;
+	delete execute;
+	delete retire;
+}
+
 int main(int argc, char **argv)
 {
 	if (argc != 2)
@@ -66,5 +78,6 @@ int main(int argc, char **argv)
 
 	std::cout << "Simulation Complete" << std::endl;
 
+	clean_memory();
 	return 0;
 }
