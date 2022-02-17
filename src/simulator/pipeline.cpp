@@ -28,14 +28,14 @@ void initialize(std::string binFile)
 	fetch = new Fetch(instructionMemory);
 	decode = new Decode();
 	execute = new Execute();
-	retire = new Retire();
+	retire = new Retire(dataMemory);
 }
 
 void cycle()
 {
 	std::cout << "\nCPU Cycle: " << CPUclock << std::endl;
 
-	// retire->cycle();
+	retire->cycle();
 	execute->cycle();
 	decode->cycle();
 	fetch->cycle();
