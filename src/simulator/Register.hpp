@@ -20,6 +20,7 @@ struct destinationReg
 {
 	int value;
 	bool is_memory;
+	bool is_store;
 };
 
 class RegSet

@@ -40,13 +40,15 @@ void Execute::cycle()
 
 	case op_enum::LD:
 		RegSet::dr.value = RegSet::ir1;
-		RegSet::dr.is_memory = false;
+		RegSet::dr.is_memory = true;
+		RegSet::dr.is_store = false;
 		RegSet::aluout.value = RegSet::ir2 + RegSet::ir3;
 		break;
 
 	case op_enum::ST:
 		RegSet::dr.value = RegSet::ir1 + RegSet::ir2;
 		RegSet::dr.is_memory = true;
+		RegSet::dr.is_store = true;
 		RegSet::aluout.value = RegSet::ir3;
 		break;
 
