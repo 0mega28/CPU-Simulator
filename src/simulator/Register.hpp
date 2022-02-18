@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <iomanip>
 
 #include "Instruction.hpp"
 
@@ -67,9 +68,9 @@ void RegSet::dumpRegisters()
 	ip.i->dumpInstruction();
 
 	cout << "\nGeneral Purpose Registers" << endl;
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < 17; i++)
 	{
-		cout << "R" << i << ": " << RegSet::gpr[i] << '\t';
+		cout << "R" << setfill('0') << setw(2) << i << ": " << setfill('0') << setw(4) << RegSet::gpr[i] << '\t';
 
 		if ((i + 1) % 4 == 0)
 			cout << endl;

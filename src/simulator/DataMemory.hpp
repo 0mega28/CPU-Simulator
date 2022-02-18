@@ -56,7 +56,7 @@ void DataMemory::dumpMemory()
 		std::cout << std::setfill('0') << std::setw(5) << i * numCols << ":\t";
 		for (int j = 0; j < numCols; j++)
 		{
-			std::cout << '\t' << dataCache[i * numCols + j] << " ";
+			std::cout << '\t' << std::setfill('0') << std::setw(3) << dataCache[i * numCols + j] << " ";
 		}
 		std::cout << std::endl;
 	}
