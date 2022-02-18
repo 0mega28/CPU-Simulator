@@ -40,6 +40,22 @@ void cycle()
 	decode->cycle();
 	fetch->cycle();
 
+	RegSet::dumpRegisters();
+
+	CPUclock++;
+}
+
+void fake_cycle()
+{
+	std::cout << "\nCPU Cycle: " << CPUclock << std::endl;
+
+	fetch->cycle();
+	decode->cycle();
+	execute->cycle();
+	retire->cycle();
+
+	RegSet::dumpRegisters();
+
 	CPUclock++;
 }
 
@@ -69,7 +85,7 @@ int main(int argc, char **argv)
 	instructionMemory->dumpMemory();
 
 	while (!setjmp(halt_cpu))
-		cycle();
+		fake_cycle();
 
 	std::cout << std::endl;
 
