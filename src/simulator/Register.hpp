@@ -62,12 +62,12 @@ public:
 void RegSet::dumpRegisters()
 {
 	using namespace std;
-	cout << "Registers: " << endl;
-	cout << "\nPC: " << RegSet::pc << endl;
-	cout << "\nIP: ";
+	cout << "\nRegisters: " << endl;
+	cout << "PC: " << RegSet::pc << endl;
+	cout << "IP: ";
 	ip.i->dumpInstruction();
 
-	cout << "\nGeneral Purpose Registers" << endl;
+	cout << "General Purpose Registers" << endl;
 	for (int i = 0; i < 17; i++)
 	{
 		cout << "R" << setfill('0') << setw(2) << i << ": " << setfill('0') << setw(4) << RegSet::gpr[i] << '\t';

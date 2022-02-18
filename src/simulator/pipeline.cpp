@@ -43,6 +43,8 @@ void cycle()
 	RegSet::dumpRegisters();
 
 	CPUclock++;
+
+	std::cout << "\n-------------------------------------------------------\n";
 }
 
 void fake_cycle()
@@ -57,6 +59,8 @@ void fake_cycle()
 	RegSet::dumpRegisters();
 
 	CPUclock++;
+
+	std::cout << "\n-------------------------------------------------------\n";
 }
 
 void clean_memory()
