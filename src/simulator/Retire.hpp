@@ -29,19 +29,7 @@ void Retire::cycle()
 	/* Branch taken */
 	if (RegSet::bt)
 	{
-		/* 
-		 * Reverse the effect of fetch unit 
-		 * since, fetch unit always increases pc by 1 
-		 * we have to substract one in case of branch instr*/
-		RegSet::pc -= 1;
-
-		/*
-		 * For jmp or branch instruction we consider an
-		 * address difference of 2 bytes between instruction
-		 * but, we are storing instruction in an array so
-		 * we don't need the 2 byte offset
-		 */
-		RegSet::pc = RegSet::pc + RegSet::aluout.value / 2;
+		RegSet::pc = RegSet::aluout.value;
 	}
 
 	/* Branch not taken */

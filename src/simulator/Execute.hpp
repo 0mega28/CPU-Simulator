@@ -15,6 +15,7 @@ void Execute::cycle()
 	if (!RegSet::cr.valid)
 		return;
 
+	RegSet::bt = false;
 	switch (RegSet::cr.value)
 	{
 	case op_enum::ADD:
@@ -65,18 +66,30 @@ void Execute::cycle()
 		RegSet::aluout.value = RegSet::ir2;
 		break;
 
+	/*
+	 * Reverse the effect of fetch unit since, fetch unit always increases pc by 1
+	 * we have to substract one in case of branch instr
+	 */
+
+	/*
+	 * For jmp or branch instruction we consider an address difference of 2 bytes between instruction
+	 * but, we are storing instruction in an array so we don't need the 2 byte offset
+	 */
 	case op_enum::JMP:
+		/* branch instr */
 		RegSet::bt = true;
-		RegSet::aluout.value = RegSet::ir1;
+		RegSet::aluout.value = RegSet::pc - 1 + RegSet::ir1 / 2;
 		break;
 
 	case op_enum::BEQZ:
-		RegSet::bt = RegSet::ir1 == 0;
-		RegSet::aluout.value = RegSet::ir2;
+		/* branch instr */
+		RegSet::bt = true;
+		/* Only change pc when ir1 == 0 */
+		RegSet::aluout.value = (RegSet::ir1 == 0) ? (RegSet::pc - 1 + RegSet::ir2 / 2) : RegSet::pc;
 		break;
 
 	case op_enum::HLT:
-	 	longjmp(halt_cpu, 1);
+		longjmp(halt_cpu, 1);
 		break;
 
 	default:
