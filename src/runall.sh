@@ -19,7 +19,7 @@ simulator_sources="$actual_dir/simulator"
 	# assemble assembly files
 	for file in $asm_files; do
 		echo "Assembling $file"
-		./assembler "$file" &>/dev/null &
+		./assembler "$file" >/dev/null &
 	done
 
 	wait
@@ -39,7 +39,7 @@ simulator_sources="$actual_dir/simulator"
 	for file in $bin_files; do
 		echo "Simulating $file"
 		out_file="$file".log
-		./simulator "$file" &>"$out_file" &
+		./simulator "$file" >"$out_file" &
 	done
 
 	wait
