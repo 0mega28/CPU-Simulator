@@ -93,7 +93,7 @@ void Execute::cycle()
 		break;
 
 	default:
-		std::cout << "Invalid opcode: " << RegSet::cr.value << std::endl;
+		std::cerr << "Invalid opcode: " << RegSet::cr.value << std::endl;
 		exit(EXIT_FAILURE);
 		break;
 	}

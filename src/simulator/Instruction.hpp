@@ -93,7 +93,7 @@ Instruction::Instruction(std::string binaryInstruction)
 
 	else
 	{
-		std::cout << "Invalid operation code: " << operationCode << std::endl;
+		std::cerr << "Invalid operation code: " << operationCode << std::endl;
 		exit(1);
 	}
 }

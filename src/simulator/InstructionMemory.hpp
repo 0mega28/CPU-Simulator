@@ -27,7 +27,7 @@ public:
 		/* Check if file opened properly */
 		if (!newfile.is_open())
 		{
-			std::cout << "Error opening file: " << filename << std::endl;
+			std::cerr << "Error opening file: " << filename << std::endl;
 			exit(1);
 		}
 
