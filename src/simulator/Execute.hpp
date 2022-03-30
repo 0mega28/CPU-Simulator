@@ -6,12 +6,31 @@
 
 class Execute
 {
+private:
+	void stall_execute_unit_action();
+
 public:
 	void cycle();
 };
 
+void Execute::stall_execute_unit_action()
+{
+#ifdef EXECUTE_LOG
+	std::cout << "Stall execute unit" << std::endl;
+#endif
+	RegSet::fu_ready[fu::EXECUTE] = false;
+}
+
 void Execute::cycle()
 {
+	if (!RegSet::fu_ready[fu::RETIRE])
+	{
+		// Retire unit is not ready stall the pipline
+		this->stall_execute_unit_action();
+		return;
+	}
+
+	/* Check if control register is valid (value isn't garbage) */
 	if (!RegSet::cr.valid)
 		return;
 
@@ -112,4 +131,12 @@ void Execute::cycle()
 	std::cout << "Execute: " << std::endl;
 	std::cout << "aluout: " << RegSet::aluout.value << "\tbt: " << RegSet::bt << "\tdr: " << RegSet::dr.value << (RegSet::dr.is_memory ? "M" : "R") << std::endl;
 #endif
+
+	RegSet::fu_ready[fu::EXECUTE] = true;
+
+	/*
+	 * Execute unit consumed current instruction so set cr validity to false
+	 * in the next decode cycle it will be set to true by decode unit
+	 */
+	RegSet::reset_decode_execute_im();
 }
