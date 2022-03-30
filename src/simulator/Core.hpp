@@ -12,8 +12,6 @@
 #include "DataMemory.hpp"
 #include "../utils.hpp"
 
-#define FAKE_CYCLE
-
 class Core
 {
 private:
@@ -28,9 +26,8 @@ private:
 	unsigned int CPUclock = 1;
 
 	void _cycle();
-	void _fake_cycle();
-
 	void cycle();
+
 public:
 	Core(std::string binFile);
 	~Core();
@@ -68,23 +65,11 @@ void Core::_cycle()
 	this->fetch->cycle();
 }
 
-void Core::_fake_cycle()
-{
-	this->fetch->cycle();
-	this->decode->cycle();
-	this->execute->cycle();
-	this->retire->cycle();
-}
-
 void Core::cycle()
 {
 	std::cout << "\nCPU Cycle: " << CPUclock << std::endl;
 
-#ifdef FAKE_CYCLE
-	this->_fake_cycle();
-#else
 	this->_cycle();
-#endif
 
 	RegSet::dumpRegisters();
 
