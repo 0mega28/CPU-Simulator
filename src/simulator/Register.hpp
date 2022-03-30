@@ -67,15 +67,56 @@ public:
 	inline static destinationReg dr = {0};
 
 	static void dumpRegisters();
+
+	static void reset_fetch_decode_im();
+	static void reset_decode_execute_im();
+	static void reset_execute_retire_im();
+	static void flush_pipeline();
 };
+
+void RegSet::reset_fetch_decode_im()
+{
+	ip = {0};
+}
+
+void RegSet::reset_decode_execute_im()
+{
+	cr = {0};
+	ir1 = 0;
+	ir2 = 0;
+	ir3 = 0;
+}
+
+void RegSet::reset_execute_retire_im()
+{
+	aluout = {0};
+	bt = false;
+	dr = {0};
+}
+
+void RegSet::flush_pipeline()
+{
+	int reg_valid_size = sizeof(reg_valid) / sizeof(reg_valid[0]);
+	int fu_valid_size = sizeof(fu_ready) / sizeof(fu_ready[0]);
+
+	for (int i = 0; i < reg_valid_size; i++)
+		reg_valid[i] = true;
+
+	for (int i = 0; i < fu_valid_size; i++)
+		fu_ready[i] = true;
+
+	is_halt_instr = false;
+
+	reset_fetch_decode_im();
+	reset_decode_execute_im();
+	reset_execute_retire_im();
+}
 
 void RegSet::dumpRegisters()
 {
 	using namespace std;
 	cout << "\nRegisters: " << endl;
 	cout << "PC: " << RegSet::pc << endl;
-	cout << "IP: ";
-	ip.i->dumpInstruction();
 
 	cout << "General Purpose Registers" << endl;
 	for (int i = 0; i < 17; i++)
