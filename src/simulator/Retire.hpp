@@ -32,10 +32,17 @@ void Retire::cycle()
 
 	if (RegSet::bt)
 	{
-		RegSet::pc = RegSet::aluout.value;
-	}
+		/* Branch instruction*/
 
-	/* Branch not taken */
+		int old_pc = RegSet::pc;
+		RegSet::pc = RegSet::aluout.value;
+
+		/* Flush the pipeline if branch is taken */
+		if (old_pc != RegSet::aluout.value)
+		{
+			RegSet::flush_pipeline();
+		}
+	}
 	else
 	{
 		if (RegSet::dr.is_memory)
