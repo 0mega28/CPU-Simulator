@@ -67,25 +67,34 @@ void Execute::cycle()
 		break;
 
 	/*
-	 * Reverse the effect of fetch unit since, fetch unit always increases pc by 1
-	 * we have to substract one in case of branch instr
-	 */
-
-	/*
-	 * For jmp or branch instruction we consider an address difference of 2 bytes between instruction
+	 * Why (RegSet::pc - 2)?
+	 * Because the instruction was fetched two cycle ago hence the pc value
+	 * must have been increased by 2 when the instruction was fetched and now
+	 * it is in execute stage hence we must have to decrease it by 2 to get
+	 * the correct pc value
+	 *
+	 * For jmp or branch instruction
+	 * we consider an address difference of 2 bytes (in our assembler implementation)
+	 * between instruction
 	 * but, we are storing instruction in an array so we don't need the 2 byte offset
 	 */
 	case op_enum::JMP:
 		/* branch instr */
+		// TODO correct aluout calculation logic for JMP and BEQZ instr
 		RegSet::bt = true;
-		RegSet::aluout.value = RegSet::pc - 1 + RegSet::ir1 / 2;
+		RegSet::aluout.value = RegSet::pc - 2 + RegSet::ir1 / 2;
 		break;
 
 	case op_enum::BEQZ:
 		/* branch instr */
 		RegSet::bt = true;
-		/* Only change pc when ir1 == 0 */
-		RegSet::aluout.value = (RegSet::ir1 == 0) ? (RegSet::pc - 1 + RegSet::ir2 / 2) : RegSet::pc;
+		/*
+		 * Why RegSet::pc + 1?
+		 * aluout value will be used in next cycle in retire stage, in that cycle pc will
+		 * be incremented by 1 so, wrong instruction will be fetched hence save incremented
+		 * pc value in alu output
+		 */
+		RegSet::aluout.value = (RegSet::ir1 == 0) ? (RegSet::pc - 2 + RegSet::ir2 / 2) : (RegSet::pc + 1);
 		break;
 
 	case op_enum::HLT:
