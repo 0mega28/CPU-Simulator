@@ -4,6 +4,7 @@
 #include <iomanip>
 
 #include "Instruction.hpp"
+#include "../utils.hpp"
 
 struct instructionPointer
 {
@@ -33,6 +34,15 @@ public:
 	/* 16 General Purpose Registers and 17th ax register for (LAX and STX) */
 	inline static int gpr[17] = {0};
 
+	/* Holds the status of the pipeline if the register is written back or not */
+	inline static bool reg_valid[17] = {true, true, true, true, true,
+					    true, true, true, true, true,
+					    true, true, true, true, true,
+					    true, true};
+
+	/* Holds the status of pipeline functional unit if they are ready or not */
+	inline static bool fu_ready[fu::NUM_FU] = {true, true, true, true};
+
 	/*
 	 * Control and intermediate registers values
 	 * fetched by decode unit from registers will
@@ -56,16 +66,60 @@ public:
 	inline static bool bt = false;
 	inline static destinationReg dr = {0};
 
+	/* Flag to store if the current instruction is halt instruction */
+	inline static bool is_halt_instr = false;
+
 	static void dumpRegisters();
+
+	static void reset_fetch_decode_im();
+	static void reset_decode_execute_im();
+	static void reset_execute_retire_im();
+	static void flush_pipeline();
 };
+
+void RegSet::reset_fetch_decode_im()
+{
+	ip = {0};
+}
+
+void RegSet::reset_decode_execute_im()
+{
+	cr = {0};
+	ir1 = 0;
+	ir2 = 0;
+	ir3 = 0;
+}
+
+void RegSet::reset_execute_retire_im()
+{
+	aluout = {0};
+	bt = false;
+	dr = {0};
+}
+
+void RegSet::flush_pipeline()
+{
+	int reg_valid_size = sizeof(reg_valid) / sizeof(reg_valid[0]);
+	int fu_valid_size = sizeof(fu_ready) / sizeof(fu_ready[0]);
+
+	for (int i = 0; i < reg_valid_size; i++)
+		reg_valid[i] = true;
+
+	for (int i = 0; i < fu_valid_size; i++)
+		fu_ready[i] = true;
+
+	is_halt_instr = false;
+
+	reset_fetch_decode_im();
+	reset_decode_execute_im();
+	reset_execute_retire_im();
+}
 
 void RegSet::dumpRegisters()
 {
 	using namespace std;
 	cout << "\nRegisters: " << endl;
 	cout << "PC: " << RegSet::pc << endl;
-	cout << "IP: ";
-	ip.i->dumpInstruction();
 
 	cout << "General Purpose Registers" << endl;
 	for (int i = 0; i < 17; i++)
@@ -76,9 +130,21 @@ void RegSet::dumpRegisters()
 			cout << endl;
 	}
 
-	cout << "\nIntermediate Registers" << endl;
-	cout << "CR: " << RegSet::cr.value << '\t';
-	cout << "IR1: " << RegSet::ir1 << '\t';
-	cout << "IR2: " << RegSet::ir2 << '\t';
-	cout << "IR3: " << RegSet::ir3 << endl;
+	cout << "\nRegister Validity" << endl;
+	for (int i = 0; i < 17; i++)
+	{
+		cout << "R" << setfill('0') << setw(2) << i << ": " << RegSet::reg_valid[i] << '\t';
+
+		if ((i + 1) % 4 == 0)
+			cout << endl;
+	}
+
+	cout << "\nFunction unit validity" << endl;
+	for (int i = 0; i < fu::NUM_FU; i++)
+	{
+		cout << i << ": " << RegSet::fu_ready[i] << '\t';
+
+		if ((i + 1) % 4 == 0)
+			cout << endl;
+	}
 }

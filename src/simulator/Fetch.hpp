@@ -10,10 +10,21 @@ private:
 	/* Reference to instruction memory */
 	InstructionMemory *instructionMemory;
 
+	/* Actions to perform when fetch unit is stalled */
+	void stall_fetch_unit_action();
+
 public:
 	Fetch(InstructionMemory *instructionMemory);
 	void cycle();
 };
+
+void Fetch::stall_fetch_unit_action()
+{
+#ifdef FETCH_LOG
+	std::cout << "Stall fetch unit" << std::endl;
+#endif
+	RegSet::fu_ready[fu::FETCH] = false;
+}
 
 Fetch::Fetch(InstructionMemory *instructionMemory)
 {
@@ -22,6 +33,13 @@ Fetch::Fetch(InstructionMemory *instructionMemory)
 
 void Fetch::cycle()
 {
+	if (!RegSet::fu_ready[fu::DECODE])
+	{
+		// Decode unit is not ready stall the pipline
+		this->stall_fetch_unit_action();
+		return;
+	}
+
 	/* Fetch instruction from instruction memory */
 	Instruction *i = instructionMemory->getInstruction(RegSet::pc);
 
@@ -45,4 +63,7 @@ void Fetch::cycle()
 	std::cout << "Fetch: " << std::endl;
 	i->dumpInstruction();
 #endif
+
+	/* Fetch unit is ready to perform other operations */
+	RegSet::fu_ready[fu::FETCH] = true;
 }

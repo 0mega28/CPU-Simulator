@@ -13,6 +13,15 @@
 #define EXECUTE_LOG
 #define RETIRE_LOG
 
+enum fu
+{
+	FETCH,
+	DECODE,
+	EXECUTE,
+	RETIRE,
+	NUM_FU
+};
+
 /* Returns binary string of an interger value */
 std::string int_to_bin(int bits, int value);
 
@@ -51,4 +60,5 @@ inline std::string op_string[] = {
     "LAX",
     "STX"};
 
+/* Reference for halt instruction to exit out of while loop */
 inline jmp_buf halt_cpu;
