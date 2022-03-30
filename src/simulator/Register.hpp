@@ -66,6 +66,9 @@ public:
 	inline static bool bt = false;
 	inline static destinationReg dr = {0};
 
+	/* Flag to store if the current instruction is halt instruction */
+	inline static bool is_halt_instr = false;
+
 	static void dumpRegisters();
 
 	static void reset_fetch_decode_im();

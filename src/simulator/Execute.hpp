@@ -98,7 +98,7 @@ void Execute::cycle()
 		break;
 
 	case op_enum::HLT:
-		longjmp(halt_cpu, 1);
+		RegSet::is_halt_instr = true;
 		break;
 
 	default:

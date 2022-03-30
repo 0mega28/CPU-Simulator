@@ -26,7 +26,10 @@ void Retire::cycle()
 	if (!RegSet::aluout.valid)
 		return;
 
-	/* Branch taken */
+	/* Halt instruction stop pipeline */
+	if (RegSet::is_halt_instr)
+		longjmp(halt_cpu, 1);
+
 	if (RegSet::bt)
 	{
 		RegSet::pc = RegSet::aluout.value;
