@@ -54,7 +54,7 @@ public:
 			return instructionCache[programCounter];
 
 		else
-			return NULL;
+			return nullptr;
 	}
 
 	void dumpMemory()
