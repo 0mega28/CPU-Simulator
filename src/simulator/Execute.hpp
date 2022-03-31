@@ -99,7 +99,6 @@ void Execute::cycle()
 	 */
 	case op_enum::JMP:
 		/* branch instr */
-		// TODO correct aluout calculation logic for JMP and BEQZ instr
 		RegSet::bt = true;
 		RegSet::aluout.value = RegSet::pc - 2 + RegSet::ir1 / 2;
 		break;
