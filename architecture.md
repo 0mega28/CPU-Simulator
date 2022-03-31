@@ -1,8 +1,9 @@
 # CPU Architecture
 
 -   Registers
-	- General Purpose Registers = 16 _i.e._, `R0 R1 ... R15`
-	- Special Purpose Register Accumulator `AX`
+
+    -   General Purpose Registers = 16 _i.e._, `R0 R1 ... R15`
+    -   Special Purpose Register Accumulator `AX`
 
 -   Size of registers = 16 bits
 
@@ -12,19 +13,20 @@
 
 -   Memory size = 2<sup>16</sup> = 65536 bytes
 
--	Memory layout is Big Endian
+-   Memory layout is Big Endian
+
 ## Instruction set
 
-| Instruction       | Result                        |
-| ----------------- | ----------------------------- |
-| `ADD R1, R2, R3`  | `R1 = R2 + R3 `               |
-| `SUB R1, R2, R3 ` | `R1 = R2 - R3 `               |
-| `MUL R1, R2, R3 ` | `R1 = R2 * R3 `               |
-| `ADD R1, R0, #5 ` | `assigns R1 = 5 `             |
-| `LD R1, A[R1] `   | `R1 = [R1+A] `                 |
-| `ST A[R1], R1 `   | `[R1+A] = R1 `                |
-| `LAX #512 `       | `assigns AX = 512 `           |
-| `STX R2 `         | `R2 = AX `                    |
-| `JMP L1 `         | `Jump to L1 label `           |
+| Instruction       | Result                       |
+| ----------------- | ---------------------------- |
+| `ADD R1, R2, R3`  | `R1 = R2 + R3 `              |
+| `SUB R1, R2, R3 ` | `R1 = R2 - R3 `              |
+| `MUL R1, R2, R3 ` | `R1 = R2 * R3 `              |
+| `ADD R1, R0, #5 ` | `assigns R1 = 5 `            |
+| `LD R1, R2[R1] `  | `R1 = [R1+R2] `              |
+| `ST R2[R1], R1 `  | `[R1+R2] = R1 `              |
+| `LAX #512 `       | `assigns AX = 512 `          |
+| `STX R2 `         | `R2 = AX `                   |
+| `JMP L1 `         | `Jump to L1 label `          |
 | `BEQZ R1, L1 `    | `Jump to L1 label if R1 = 0` |
-| `HLT `            | `Halt the computation `       |
+| `HLT `            | `Halt the computation `      |
