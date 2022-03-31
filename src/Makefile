@@ -12,16 +12,18 @@ simulator=simulator/simulator
 all: ${assembler} ${simulator} ${assembler_out_src} ${simulator_out_src}
 
 ${assembler}: ${assembler_src} ${utils_src}
-	make -C assembler
+	+make -C assembler
 
 ${simulator}: ${simulator_src} ${utils_src}
-	make -C simulator
+	+make -C simulator
 
 %.bin: %.s ${assembler}
-	${assembler} $<
+	${assembler} $< > /dev/null
 
 %.bin.log: %.bin ${simulator}
 	${simulator} $< > $@
 
 clean:
-	rm -f ${assembler_out_src} ${simulator_out_src} ${assembler} ${simulator}
+	rm -f ${assembler_out_src} ${simulator_out_src}
+	+make -C assembler clean
+	+make -C simulator clean
