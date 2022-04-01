@@ -1,6 +1,6 @@
 /*
  _____                 ____
-|_   _|_      _____   |  _ \ __ _ ___ ___ 
+|_   _|_      _____   |  _ \ __ _ ___ ___
   | | \ \ /\ / / _ \  | |_) / _` / __/ __|
   | |  \ V  V / (_) | |  __/ (_| \__ \__ \
   |_|   \_/\_/ \___/  |_|   \__,_|___/___/
@@ -26,8 +26,7 @@
 #include <vector>
 #include <bitset>
 #include <unordered_map>
-
-#include <boost/algorithm/string.hpp>
+#include <regex>
 
 #include "../utils.hpp"
 
@@ -59,7 +58,7 @@ void parse_asm_file(std::string asm_f)
 	while (std::getline(asm_str, line))
 	{
 		/* Trim leading and trailing whitespaces */
-		boost::algorithm::trim(line);
+		line = std::regex_replace(line, std::regex("^ +| +$"), "");
 
 		/* Skip empty lines and comments */
 		if (line.length() == 0 || line[0] == ';')
@@ -129,7 +128,8 @@ void label_parser()
 void ld_st_operand_parser(std::string operand, std::string &rs, std::string &rt)
 {
 	std::vector<std::string> operand_list;
-	boost::split(operand_list, operand, boost::is_any_of("["));
+	operand_list.push_back(operand.substr(0, operand.find("[")));
+	operand_list.push_back(operand.substr(operand.find("[") + 1));
 
 	rs = operand_list[0];
 	rt = operand_list[1].substr(0, operand_list[1].length() - 1);
