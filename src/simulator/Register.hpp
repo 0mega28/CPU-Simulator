@@ -32,7 +32,7 @@ public:
 	inline static instructionPointer ip = {0};
 
 	/* 16 General Purpose Registers and 17th ax register for (LAX and STX) */
-	inline static int gpr[17] = {0};
+	inline static int gpr[NUM_REGS + 1] = {0};
 
 	/* Holds the status of the pipeline if the register is written back or not */
 	inline static bool reg_valid[17] = {true, true, true, true, true,
