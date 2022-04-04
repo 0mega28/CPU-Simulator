@@ -21,6 +21,7 @@ int bin_to_int(std::string binary, bool isImmediate);
 
 enum op_enum
 {
+	DMY = -1, /* Dummy */
 	ADD,
 	ADDI,
 	SUB,
@@ -33,9 +34,11 @@ enum op_enum
 	BEQZ,
 	HLT,
 	LAX,
-	STX
+	STX,
+	NUM_OP
 };
 
+/* Operand enum to string */
 inline std::string op_string[] = {
     "ADD",
     "ADDI",
