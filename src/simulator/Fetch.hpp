@@ -34,7 +34,7 @@ void Fetch::cycle()
 {
 	if (!RegSet::is_operand_ready)
 	{
-		// Decode unit is not ready stall the pipline
+		/* Decode unit is not ready stall the pipline */
 		this->stall_fetch_unit_action();
 		return;
 	}

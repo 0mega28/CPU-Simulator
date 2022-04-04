@@ -10,6 +10,7 @@
 #include "Register.hpp"
 #include "InstructionMemory.hpp"
 #include "DataMemory.hpp"
+#include "fu_status.hpp"
 #include "../utils.hpp"
 
 class Core
@@ -44,6 +45,10 @@ Core::Core(std::string binFile)
 	this->decode = new Decode();
 	this->execute = new Execute();
 	this->retire = new Retire(this->dataMemory);
+
+	/* Initialize Fu status and reg status */
+	Fu_status::init();
+	reg_status.fill(fu_enum::DMY_FU);
 }
 
 Core::~Core()

@@ -19,6 +19,18 @@ std::string int_to_bin(int bits, int value);
 /* Returns integer from a binary string */
 int bin_to_int(std::string binary, bool isImmediate);
 
+/* Functional unit enum */
+enum fu_enum
+{
+	DMY_FU = -1, /* DMY */
+	ALU_FU,	     /* ADD / SUB / LAX / STX */
+	MUL_FU,	     /* MUL */
+	DIV_FU,	     /* DIV */
+	LDST_FU,     /* LD / ST */
+	NUM_FU,
+};
+
+/* Operand enum */
 enum op_enum
 {
 	DMY = -1, /* Dummy */
