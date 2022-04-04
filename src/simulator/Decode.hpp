@@ -21,18 +21,11 @@ void Decode::stall_decode_unit_action()
 #ifdef DECODE_LOG
 	std::cout << "Stall decode unit" << std::endl;
 #endif
-	RegSet::fu_ready[fu::DECODE] = false;
+	RegSet::is_operand_ready = false;
 }
 
 void Decode::cycle()
 {
-	if (!RegSet::fu_ready[fu::EXECUTE])
-	{
-		// Execute unit is not ready stall the pipline
-		this->stall_decode_unit_action();
-		return;
-	}
-
 	/* Read instruction from instruction pointer */
 	Instruction *i = RegSet::ip.i;
 
@@ -156,7 +149,7 @@ void Decode::cycle()
 	std::cout << "CR: " << op_string[RegSet::cr.value] << "\tIR1: " << RegSet::ir1 << "\tIR2: " << RegSet::ir2 << "\tIR3: " << RegSet::ir3 << std::endl;
 #endif
 
-	RegSet::fu_ready[fu::DECODE] = true;
+	RegSet::is_operand_ready = true;
 
 	/*
 	 * Decode unit consumed current instruction so set ip validity to false

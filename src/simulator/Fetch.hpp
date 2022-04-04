@@ -23,7 +23,6 @@ void Fetch::stall_fetch_unit_action()
 #ifdef FETCH_LOG
 	std::cout << "Stall fetch unit" << std::endl;
 #endif
-	RegSet::fu_ready[fu::FETCH] = false;
 }
 
 Fetch::Fetch(InstructionMemory *instructionMemory)
@@ -33,7 +32,7 @@ Fetch::Fetch(InstructionMemory *instructionMemory)
 
 void Fetch::cycle()
 {
-	if (!RegSet::fu_ready[fu::DECODE])
+	if (!RegSet::is_operand_ready)
 	{
 		// Decode unit is not ready stall the pipline
 		this->stall_fetch_unit_action();
@@ -63,7 +62,4 @@ void Fetch::cycle()
 	std::cout << "Fetch: " << std::endl;
 	i->dumpInstruction();
 #endif
-
-	/* Fetch unit is ready to perform other operations */
-	RegSet::fu_ready[fu::FETCH] = true;
 }

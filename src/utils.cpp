@@ -22,14 +22,12 @@ std::string findTwoscomplement(std::string str)
 	;
 }
 
-/* Returns binary string of an interger value */
 std::string int_to_bin(int bits, int value)
 {
 	std::bitset<CPU_ARCH> bin(value);
 	return bin.to_string().substr(CPU_ARCH - bits);
 }
 
-/* Returns integer from a binary string */
 int bin_to_int(std::string binary, bool isImmediate)
 {
 	if (!isImmediate || binary[0] == '0')

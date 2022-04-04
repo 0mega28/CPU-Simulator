@@ -40,8 +40,11 @@ public:
 					    true, true, true, true, true,
 					    true, true};
 
-	/* Holds the status of pipeline functional unit if they are ready or not */
-	inline static bool fu_ready[fu::NUM_FU] = {true, true, true, true};
+	/*
+	 * tracks the status if decode unit is able to fetch all the operand values
+	 * due to data hazards
+	 */
+	inline static bool is_operand_ready = true;
 
 	/*
 	 * Control and intermediate registers values
@@ -71,9 +74,16 @@ public:
 
 	static void dumpRegisters();
 
+	/* Reset fetch decode intermediate register */
 	static void reset_fetch_decode_im();
+
+	/* Reset decode execute intermediate register */
 	static void reset_decode_execute_im();
+
+	/* Reset execute retire intermediate register */
 	static void reset_execute_retire_im();
+
+	/* Reset everything */
 	static void flush_pipeline();
 };
 
@@ -100,13 +110,12 @@ void RegSet::reset_execute_retire_im()
 void RegSet::flush_pipeline()
 {
 	int reg_valid_size = sizeof(reg_valid) / sizeof(reg_valid[0]);
-	int fu_valid_size = sizeof(fu_ready) / sizeof(fu_ready[0]);
 
+	/* Set all the registers as valid */
 	for (int i = 0; i < reg_valid_size; i++)
 		reg_valid[i] = true;
 
-	for (int i = 0; i < fu_valid_size; i++)
-		fu_ready[i] = true;
+	is_operand_ready = true;
 
 	is_halt_instr = false;
 
@@ -139,12 +148,5 @@ void RegSet::dumpRegisters()
 			cout << endl;
 	}
 
-	cout << "\nFunction unit validity" << endl;
-	for (int i = 0; i < fu::NUM_FU; i++)
-	{
-		cout << i << ": " << RegSet::fu_ready[i] << '\t';
-
-		if ((i + 1) % 4 == 0)
-			cout << endl;
-	}
+	cout << "Is operand ready: " << RegSet::is_operand_ready << endl;
 }
