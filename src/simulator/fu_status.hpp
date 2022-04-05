@@ -22,7 +22,18 @@ struct fu_status_entry
 	fu_enum qj, qk, ql;
 	/* Ready state of src reg, true means the output will be produced by some fu */
 	bool rj, rk, rl;
+
+	void reset_entry();
 };
+
+void fu_status_entry::reset_entry()
+{
+	busy = false;
+	op = op_enum::DMY;
+	fj = fk = fl = imm = fi = -1;
+	qj = qk = ql = DMY_FU;
+	rj = rk = rl = false;
+}
 
 /*
  * Tracks the status of the functional units

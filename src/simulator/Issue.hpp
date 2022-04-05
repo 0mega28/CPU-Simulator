@@ -35,6 +35,9 @@ void Issue::cycle()
 	if (reg_status[instr.dest_reg] != fu_enum::DMY_FU)
 		return;
 
+	/* Reset the current fu entry */
+	fu.reset_entry();
+
 	/* Set fu state to busy (Removes structural hazards) and op */
 	fu.busy = true;
 	fu.op = op;
