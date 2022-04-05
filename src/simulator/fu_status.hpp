@@ -11,12 +11,14 @@ struct fu_status_entry
 	bool busy = false;
 	/* Operation to perform in the unit */
 	op_enum op;
-	/* Source 1 and Source 2 register number, respecively */
-	int fj, fk;
+	/* Source 1,2,3 register number, respecively */
+	int fj, fk, fl;
+	/* Immediate value */
+	int imm;
 	/* Output register number */
 	int fi;
-	/* Functional unit that will produce the source registers fj, fk */
-	fu_enum qj, qk;
+	/* Functional unit that will produce the source registers fj, fk, fl*/
+	fu_enum qj, qk, ql;
 };
 
 class Fu_status

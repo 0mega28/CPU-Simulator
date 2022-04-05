@@ -32,6 +32,7 @@ struct iq_entry
 	op_enum op;
 	int src_reg1;
 	int src_reg2;
+	int src_reg3;
 	int dest_reg;
 	int imm_val;
 };
