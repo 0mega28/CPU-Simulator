@@ -3,6 +3,7 @@
 #include <iostream>
 #include <iomanip>
 #include <queue>
+#include <cassert>
 
 #include "Instruction.hpp"
 #include "../utils.hpp"
@@ -81,10 +82,14 @@ public:
 	/* Reset fetch decode intermediate register */
 	static void reset_fetch_decode_im();
 
-	// TODO: add why and when will this be used
-	// In case of pipeline flush? yes.
-	/* Reset instruction queue */
-	static void reset_decode_issue_im();
+	/*
+	 * We don't need any reset decode issue im func in issue stage
+	 * since issue unit will pop the instruction which it has issued
+	 * to some functional unit
+	 */
+
+	// TODO add reset function for issue and operand fetch stage
+	// TODO add reset function for operand fetch and execute stage
 
 	/* Reset execute retire intermediate register */
 	static void reset_execute_retire_im();
@@ -96,12 +101,6 @@ public:
 void RegSet::reset_fetch_decode_im()
 {
 	ip = {0};
-}
-
-void RegSet::reset_decode_issue_im()
-{
-	// TODO: implement
-	assert(false);
 }
 
 void RegSet::reset_execute_retire_im()
@@ -123,7 +122,9 @@ void RegSet::flush_pipeline()
 	is_halt_instr = false;
 
 	reset_fetch_decode_im();
-	// TODO handle decode issue reset
+	// TODO handle decode issue reset? do we need to flush iq?
+	// TODO handle issue operand fetch reset
+	// TODO handle operand fetch execute reset
 	reset_execute_retire_im();
 }
 

@@ -5,6 +5,7 @@
 
 #include "Fetch.hpp"
 #include "Decode.hpp"
+#include "Issue.hpp"
 #include "Execute.hpp"
 #include "Retire.hpp"
 #include "Register.hpp"
@@ -18,6 +19,7 @@ class Core
 private:
 	Fetch *fetch;
 	Decode *decode;
+	Issue *issue;
 	Execute *execute;
 	Retire *retire;
 
@@ -43,6 +45,7 @@ Core::Core(std::string binFile)
 
 	this->fetch = new Fetch(this->instructionMemory);
 	this->decode = new Decode();
+	this->issue = new Issue();
 	this->execute = new Execute();
 	this->retire = new Retire(this->dataMemory);
 
@@ -58,6 +61,7 @@ Core::~Core()
 
 	delete this->fetch;
 	delete this->decode;
+	delete this->issue;
 	delete this->execute;
 	delete this->retire;
 }
@@ -66,6 +70,7 @@ void Core::_cycle()
 {
 	this->retire->cycle();
 	this->execute->cycle();
+	this->issue->cycle();
 	this->decode->cycle();
 	this->fetch->cycle();
 }

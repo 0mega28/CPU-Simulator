@@ -36,8 +36,6 @@ void Decode::cycle()
 		iqe.dest_reg = i->getop1(); /* R1 */
 		iqe.src_reg1 = i->getop2(); /* R2 */
 		iqe.src_reg2 = i->getop3(); /* R3 */
-		// TODO: handle memory validity for load instruction
-		// TODO: move the above todo to appropriate location
 		break;
 
 	case op_enum::ADDI:		    /* ADDI R1 R2 #5 */
@@ -52,8 +50,6 @@ void Decode::cycle()
 		iqe.src_reg1 = i->getop1(); /* R1 */
 		iqe.src_reg2 = i->getop2(); /* R2 */
 		iqe.src_reg3 = i->getop3(); /* R3 */
-		// TODO: handle memory validity
-		// TODO: move the above todo to appropriate location
 		break;
 
 	case op_enum::LAX:		   /* LAX #23 */
