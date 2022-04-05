@@ -8,21 +8,9 @@
 
 class Decode
 {
-private:
-	/* Actions to perform when decode unit is stalled */
-	void stall_decode_unit_action();
-
 public:
 	void cycle();
 };
-
-void Decode::stall_decode_unit_action()
-{
-#ifdef DECODE_LOG
-	std::cout << "Stall decode unit" << std::endl;
-#endif
-	RegSet::is_operand_ready = false;
-}
 
 void Decode::cycle()
 {
