@@ -21,42 +21,11 @@ struct fu_status_entry
 	fu_enum qj, qk, ql;
 };
 
-class Fu_status
-{
-private:
-	/* Entries for different functional unit */
-	static inline std::array<fu_status_entry, fu_enum::NUM_FU> entry;
-
-public:
-	/*
-	 * Init is called from Core class constructor
-	 * Set all fu status busy state to false
-	 */
-	static void init();
-
-	/* Add the instr to the entry for the functional unit fu */
-	static void set_entry(Instruction instr, fu_enum fu);
-
-	static fu_status_entry get_entry(fu_enum fu);
-};
-
-void Fu_status::init()
-{
-	entry.fill({.busy = false});
-}
-
-#include <cassert>
-void Fu_status::set_entry(Instruction instr, fu_enum fu)
-{
-	// use something else instead of instr arg
-	// TODO: implement
-	assert(false);
-}
-
-fu_status_entry Fu_status::get_entry(fu_enum fu)
-{
-	return entry[fu];
-}
+/*
+ * Tracks the status of the functional units
+ * Core class constructor initialises the array with all fu busy state to false
+ */
+inline std::array<fu_status_entry, fu_enum::NUM_FU> fu_status;
 
 /*
  * Why NUM_REGS + 1?

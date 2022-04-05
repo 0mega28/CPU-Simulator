@@ -46,8 +46,8 @@ Core::Core(std::string binFile)
 	this->execute = new Execute();
 	this->retire = new Retire(this->dataMemory);
 
-	/* Initialize Fu status and reg status */
-	Fu_status::init();
+	/* Initialize fu status and reg status */
+	fu_status.fill({.busy = false});
 	reg_status.fill(fu_enum::DMY_FU);
 }
 
