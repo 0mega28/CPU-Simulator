@@ -11,6 +11,7 @@
 /* Log level */
 #define FETCH_LOG
 #define DECODE_LOG
+#define ISSUE_LOG
 #define EXECUTE_LOG
 #define RETIRE_LOG
 
@@ -27,6 +28,8 @@ enum fu_enum
 	ALU_FU,	     /* ADD / SUB / LAX / STX */
 	MUL_FU,	     /* MUL */
 	LDST_FU,     /* LD / ST */
+	BRCH_FU,     /* JMP / BEQZ */
+	UTIL_FU,     /* HLT */
 	NUM_FU,
 };
 
@@ -60,9 +63,9 @@ inline std::unordered_map<op_enum, fu_enum> op_to_fu = {
     {MULI, MUL_FU},
     {LD, LDST_FU},
     {ST, LDST_FU},
-    {JMP, DMY_FU},  // TODO: decide which fu to use for JMP
-    {BEQZ, DMY_FU}, // TODO: decide which fu to use for BEQZ
-    {HLT, DMY_FU},  // TODO: decide which fu to use for HLT
+    {JMP, BRCH_FU},
+    {BEQZ, BRCH_FU},
+    {HLT, UTIL_FU},
     {LAX, ALU_FU},
     {STX, ALU_FU}};
 
