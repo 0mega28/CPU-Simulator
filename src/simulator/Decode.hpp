@@ -33,123 +33,75 @@ void Decode::cycle()
 	if (!RegSet::ip.valid)
 		return;
 
+	/* Issue queue entry */
+	iq_entry iqe;
+	/* Add the opcode entry to iq entry */
+	iqe.op = (op_enum)i->getOpcode();
+
 	/* Decode instruction and store in intermediate registers */
 	switch (i->getOpcode())
 	{
-	case op_enum::ADD:
-	case op_enum::SUB:
-	case op_enum::MUL:
-	case op_enum::LD:
-		/* If input registers are not valid, return */
-		if (!RegSet::reg_valid[i->getop2()] ||
-		    !RegSet::reg_valid[i->getop3()])
-		{
-			this->stall_decode_unit_action();
-			return;
-		}
-
-		RegSet::ir1 = i->getop1();
-		RegSet::ir2 = RegSet::gpr[i->getop2()];
-		RegSet::ir3 = RegSet::gpr[i->getop3()];
-
-		/* Set destination register invalid */
-		RegSet::reg_valid[RegSet::ir1] = false;
-
+	case op_enum::ADD:		    /* ADD R1 R2 R3 */
+	case op_enum::SUB:		    /* SUB R1 R2 R3 */
+	case op_enum::MUL:		    /* MUL R1 R2 R3 */
+	case op_enum::LD:		    /* LD R1 R2[R3] */
+		iqe.dest_reg = i->getop1(); /* R1 */
+		iqe.src_reg1 = i->getop2(); /* R2 */
+		iqe.src_reg2 = i->getop3(); /* R3 */
 		// TODO: handle memory validity for load instruction
+		// TODO: move the above todo to appropriate location
 		break;
 
-	case op_enum::ADDI:
-	case op_enum::SUBI:
-	case op_enum::MULI:
-		/* If input register is not valid, return */
-		if (!RegSet::reg_valid[i->getop2()])
-		{
-			this->stall_decode_unit_action();
-			return;
-		}
-
-		RegSet::ir1 = i->getop1();
-		RegSet::ir2 = RegSet::gpr[i->getop2()];
-		RegSet::ir3 = i->getop3();
-
-		/* Set destination register invalid */
-		RegSet::reg_valid[RegSet::ir1] = false;
+	case op_enum::ADDI:		    /* ADDI R1 R2 #5 */
+	case op_enum::SUBI:		    /* SUBI R1 R2 #5 */
+	case op_enum::MULI:		    /* MULI R1 R2 #5 */
+		iqe.dest_reg = i->getop1(); /* R1 */
+		iqe.src_reg1 = i->getop2(); /* R2 */
+		iqe.imm_val = i->getop3();  /* #5 */
 		break;
 
-	case op_enum::ST:
-		/* If input registers are not valid, return */
-		if (!RegSet::reg_valid[i->getop1()] ||
-		    !RegSet::reg_valid[i->getop2()] ||
-		    !RegSet::reg_valid[i->getop3()])
-		{
-			this->stall_decode_unit_action();
-			return;
-		}
-
-		RegSet::ir1 = RegSet::gpr[i->getop1()];
-		RegSet::ir2 = RegSet::gpr[i->getop2()];
-		RegSet::ir3 = RegSet::gpr[i->getop3()];
-
+	case op_enum::ST:		    /* ST R1[R2] R3 */
+		iqe.src_reg1 = i->getop1(); /* R1 */
+		iqe.src_reg2 = i->getop2(); /* R2 */
+		iqe.src_reg3 = i->getop3(); /* R3 */
 		// TODO: handle memory validity
+		// TODO: move the above todo to appropriate location
 		break;
 
-	case op_enum::LAX:
-		RegSet::ir1 = i->getop1();
-
-		/* Set destination register invalid */
-		RegSet::reg_valid[16] = false;
+	case op_enum::LAX:		   /* LAX #23 */
+		iqe.dest_reg = 16;	   /* ax register */
+		iqe.imm_val = i->getop1(); /* #23 */
 		break;
 
-	case op_enum::JMP:
-		RegSet::ir1 = i->getop1();
+	case op_enum::JMP:		   /* JMP L1 */
+		iqe.imm_val = i->getop1(); /* L1 */
 		break;
 
-	case op_enum::STX:
-		/* If input register is not valid, return */
-		if (!RegSet::reg_valid[16])
-		{
-			this->stall_decode_unit_action();
-			return;
-		}
-
-		RegSet::ir1 = i->getop1();
-		RegSet::ir2 = RegSet::gpr[16];
-
-		/* Set destination register invalid */
-		RegSet::reg_valid[RegSet::ir1] = false;
+	case op_enum::STX:		    /* STX R1 */
+		iqe.dest_reg = i->getop1(); /* R1 */
+		iqe.src_reg1 = 16;	    /* ax register */
 		break;
 
-	case op_enum::BEQZ:
-		/* If input register is not valid, return */
-		if (!RegSet::reg_valid[i->getop1()])
-		{
-			this->stall_decode_unit_action();
-			return;
-		}
-
-		RegSet::ir1 = RegSet::gpr[i->getop1()];
-		RegSet::ir2 = i->getop2();
+	case op_enum::BEQZ:		    /* BEQZ R1 L1 */
+		iqe.src_reg1 = i->getop1(); /* R1 */
+		iqe.imm_val = i->getop2();  /* L1 */
 		break;
 
-	case op_enum::HLT:
+	case op_enum::HLT: /* HLT */
 		break;
 
 	default:
-		std::cerr << "Invalid operation code: " << RegSet::cr.value << std::endl;
+		std::cerr << "Invalid operation code: " << i->getOpcode() << std::endl;
 		exit(EXIT_FAILURE);
 		break;
 	}
 
-	/* Set control register for execute unit */
-	RegSet::cr.value = i->getOpcode();
-	RegSet::cr.valid = true;
-
 #ifdef DECODE_LOG
 	std::cout << "Decode: " << std::endl;
-	std::cout << "CR: " << op_string[RegSet::cr.value] << "\tIR1: " << RegSet::ir1 << "\tIR2: " << RegSet::ir2 << "\tIR3: " << RegSet::ir3 << std::endl;
+	// TODO: handle decode log
 #endif
 
-	RegSet::is_operand_ready = true;
+	RegSet::iq.push(iqe);
 
 	/*
 	 * Decode unit consumed current instruction so set ip validity to false

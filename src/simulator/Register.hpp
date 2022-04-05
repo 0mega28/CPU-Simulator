@@ -27,6 +27,7 @@ struct destinationReg
 };
 
 /* Instruction queue entry */
+// TODO add dump iq_entry function
 struct iq_entry
 {
 	op_enum op;
@@ -53,34 +54,13 @@ public:
 					    true, true, true, true, true,
 					    true, true};
 
-	// TODO: remove is_operand_ready it will be handled by operand fetch stage using fu_status
-	// reservation table
-	/*
-	 * tracks the status if decode unit is able to fetch all the operand values
-	 * due to data hazards
-	 */
-	inline static bool is_operand_ready = true;
-
-	// TODO: remove this as the data to execution unit will be given by fu_status reservation table
-	/*
-	 * Control and intermediate registers values
-	 * fetched by decode unit from registers will
-	 * be stored in intermediate register
-	 * ir1 will store the destination register (if any used)
-	 * ir1 and ir2 will store the source registers (values)
-	 */
-	inline static intermReg cr = {0};
-	inline static int ir1 = 0;
-	inline static int ir2 = 0;
-	inline static int ir3 = 0;
-
 	/*
 	 * Instruction queue
 	 * Decode unit will pick up the instruction decodes the instruction and put into instruction queue
 	 * Issue stage will use instruction queue to allocate function unit
 	 */
 	// TODO: add reset function for decode issue stage
-	std::queue<iq_entry> iq;
+	inline static std::queue<iq_entry> iq = {};
 
 	/*
 	 * aluout stores result calculated by ALU
@@ -101,8 +81,10 @@ public:
 	/* Reset fetch decode intermediate register */
 	static void reset_fetch_decode_im();
 
-	/* Reset decode execute intermediate register */
-	static void reset_decode_execute_im();
+	// TODO: add why and when will this be used
+	// In case of pipeline flush? yes.
+	/* Reset instruction queue */
+	static void reset_decode_issue_im();
 
 	/* Reset execute retire intermediate register */
 	static void reset_execute_retire_im();
@@ -116,14 +98,10 @@ void RegSet::reset_fetch_decode_im()
 	ip = {0};
 }
 
-// TODO: remove this as the data to execution unit will be given by fu_status reservation table
-// and decode stage interacts with the issue stage
-void RegSet::reset_decode_execute_im()
+void RegSet::reset_decode_issue_im()
 {
-	cr = {0};
-	ir1 = 0;
-	ir2 = 0;
-	ir3 = 0;
+	// TODO: implement
+	assert(false);
 }
 
 void RegSet::reset_execute_retire_im()
@@ -142,12 +120,10 @@ void RegSet::flush_pipeline()
 	for (int i = 0; i < reg_valid_size; i++)
 		reg_valid[i] = true;
 
-	is_operand_ready = true;
-
 	is_halt_instr = false;
 
 	reset_fetch_decode_im();
-	reset_decode_execute_im();
+	// TODO handle decode issue reset
 	reset_execute_retire_im();
 }
 
@@ -176,6 +152,4 @@ void RegSet::dumpRegisters()
 		if ((i + 1) % 4 == 0)
 			cout << endl;
 	}
-
-	cout << "Is operand ready: " << RegSet::is_operand_ready << endl;
 }
