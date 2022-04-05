@@ -3,6 +3,7 @@
 #include <string>
 #include <bitset>
 #include <setjmp.h>
+#include <unordered_map>
 
 #define NUM_REGS 16
 #define CPU_ARCH 16
@@ -48,6 +49,22 @@ enum op_enum
 	STX,
 	NUM_OP
 };
+
+/* map from op_enum to fu_enum */
+inline std::unordered_map<op_enum, fu_enum> op_to_fu = {
+    {ADD, ALU_FU},
+    {ADDI, ALU_FU},
+    {SUB, ALU_FU},
+    {SUBI, ALU_FU},
+    {MUL, MUL_FU},
+    {MULI, MUL_FU},
+    {LD, LDST_FU},
+    {ST, LDST_FU},
+    {JMP, DMY_FU},  // TODO: decide which fu to use for JMP
+    {BEQZ, DMY_FU}, // TODO: decide which fu to use for BEQZ
+    {HLT, DMY_FU},  // TODO: decide which fu to use for HLT
+    {LAX, ALU_FU},
+    {STX, ALU_FU}};
 
 /* Operand enum to string */
 inline std::string op_string[] = {
