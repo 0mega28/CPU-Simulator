@@ -56,8 +56,8 @@ void Issue::cycle()
 		fu.qj = reg_status[instr.src_reg1];
 		fu.qk = reg_status[instr.src_reg2];
 
-		fu.rj = fu.qj != fu_enum::DMY_FU;
-		fu.rk = fu.qk != fu_enum::DMY_FU;
+		fu.rj = fu.qj == fu_enum::DMY_FU;
+		fu.rk = fu.qk == fu_enum::DMY_FU;
 
 		reg_status[instr.dest_reg] = op_to_fu[op];
 		// TODO: handle memory validity for load instruction
@@ -73,7 +73,7 @@ void Issue::cycle()
 
 		fu.qj = reg_status[instr.src_reg1];
 
-		fu.rj = fu.qj != fu_enum::DMY_FU;
+		fu.rj = fu.qj == fu_enum::DMY_FU;
 
 		reg_status[instr.dest_reg] = op_to_fu[op];
 		break;
@@ -87,9 +87,9 @@ void Issue::cycle()
 		fu.qk = reg_status[instr.src_reg2];
 		fu.ql = reg_status[instr.src_reg3];
 
-		fu.rj = fu.qj != fu_enum::DMY_FU;
-		fu.rk = fu.qk != fu_enum::DMY_FU;
-		fu.rl = fu.ql != fu_enum::DMY_FU;
+		fu.rj = fu.qj == fu_enum::DMY_FU;
+		fu.rk = fu.qk == fu_enum::DMY_FU;
+		fu.rl = fu.ql == fu_enum::DMY_FU;
 		// TODO: handle memory validity
 		// is it necessary?
 		break;
@@ -111,7 +111,7 @@ void Issue::cycle()
 
 		fu.qj = reg_status[instr.src_reg1];
 
-		fu.rj = fu.qj != fu_enum::DMY_FU;
+		fu.rj = fu.qj == fu_enum::DMY_FU;
 
 		reg_status[instr.dest_reg] = op_to_fu[op];
 		break;
@@ -122,7 +122,7 @@ void Issue::cycle()
 
 		fu.qj = reg_status[instr.src_reg1];
 
-		fu.rj = fu.qj != fu_enum::DMY_FU;
+		fu.rj = fu.qj == fu_enum::DMY_FU;
 
 		reg_status[instr.dest_reg] = op_to_fu[op];
 		break;

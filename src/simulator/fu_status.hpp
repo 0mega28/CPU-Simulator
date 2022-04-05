@@ -20,8 +20,13 @@ struct fu_status_entry
 	int fi;
 	/* Functional unit that will produce the source registers fj, fk, fl*/
 	fu_enum qj, qk, ql;
-	/* Ready state of src reg, true means the output will be produced by some fu */
+	/* flags that indicates when f* is ready for and are not yet read */
 	bool rj, rk, rl;
+	/*
+	 * is the operand fetched
+	 * it also signal the execution unit that it can perform operation
+	 */
+	bool fetched;
 
 	void reset_entry();
 };
@@ -32,7 +37,8 @@ void fu_status_entry::reset_entry()
 	op = op_enum::DMY;
 	fj = fk = fl = imm = fi = -1;
 	qj = qk = ql = DMY_FU;
-	rj = rk = rl = false;
+	rj = rk = rl = true;
+	fetched = false;
 }
 
 /*
@@ -47,7 +53,7 @@ inline void dump_fu_entry(fu_enum fu)
 	auto &fu_entry = fu_status[fu];
 
 	cout << "FU: " << fu << " busy: " << fu_entry.busy << endl;
-	cout << "Op: " << fu_entry.op << endl;
+	cout << "Op: " << fu_entry.op << " isfetched: " << fu_entry.fetched << endl;
 	cout << "Src reg fj: " << fu_entry.fj << " fk: " << fu_entry.fk << " fl: " << fu_entry.fl << endl;
 	cout << "imm: " << fu_entry.imm << endl;
 	cout << "Dest reg fi: " << fu_entry.fi << endl;
