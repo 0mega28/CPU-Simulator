@@ -25,7 +25,6 @@ enum fu_enum
 	DMY_FU = -1, /* DMY */
 	ALU_FU,	     /* ADD / SUB / LAX / STX */
 	MUL_FU,	     /* MUL */
-	DIV_FU,	     /* DIV */
 	LDST_FU,     /* LD / ST */
 	NUM_FU,
 };
