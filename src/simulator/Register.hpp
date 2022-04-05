@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <queue>
 
 #include "Instruction.hpp"
 #include "../utils.hpp"
@@ -25,6 +26,16 @@ struct destinationReg
 	bool is_store;
 };
 
+/* Instruction queue entry */
+struct iq_entry
+{
+	op_enum op;
+	int src_reg1;
+	int src_reg2;
+	int dest_reg;
+	int imm_val;
+};
+
 class RegSet
 {
 public:
@@ -34,18 +45,22 @@ public:
 	/* 16 General Purpose Registers and 17th ax register for (LAX and STX) */
 	inline static int gpr[NUM_REGS + 1] = {0};
 
+	// TODO: remove the reg_valid as the status is stored in fu_status -> reg_status
 	/* Holds the status of the pipeline if the register is written back or not */
 	inline static bool reg_valid[17] = {true, true, true, true, true,
 					    true, true, true, true, true,
 					    true, true, true, true, true,
 					    true, true};
 
+	// TODO: remove is_operand_ready it will be handled by operand fetch stage using fu_status
+	// reservation table
 	/*
 	 * tracks the status if decode unit is able to fetch all the operand values
 	 * due to data hazards
 	 */
 	inline static bool is_operand_ready = true;
 
+	// TODO: remove this as the data to execution unit will be given by fu_status reservation table
 	/*
 	 * Control and intermediate registers values
 	 * fetched by decode unit from registers will
@@ -57,6 +72,14 @@ public:
 	inline static int ir1 = 0;
 	inline static int ir2 = 0;
 	inline static int ir3 = 0;
+
+	/*
+	 * Instruction queue
+	 * Decode unit will pick up the instruction decodes the instruction and put into instruction queue
+	 * Issue stage will use instruction queue to allocate function unit
+	 */
+	// TODO: add reset function for decode issue stage
+	std::queue<iq_entry> iq;
 
 	/*
 	 * aluout stores result calculated by ALU
@@ -92,6 +115,8 @@ void RegSet::reset_fetch_decode_im()
 	ip = {0};
 }
 
+// TODO: remove this as the data to execution unit will be given by fu_status reservation table
+// and decode stage interacts with the issue stage
 void RegSet::reset_decode_execute_im()
 {
 	cr = {0};
@@ -107,6 +132,7 @@ void RegSet::reset_execute_retire_im()
 	dr = {0};
 }
 
+// TODO: change reset function call
 void RegSet::flush_pipeline()
 {
 	int reg_valid_size = sizeof(reg_valid) / sizeof(reg_valid[0]);
@@ -124,6 +150,8 @@ void RegSet::flush_pipeline()
 	reset_execute_retire_im();
 }
 
+// TODO: check this function for correct dump of register as there will be
+// many changes due to implementation of scoreboarding
 void RegSet::dumpRegisters()
 {
 	using namespace std;

@@ -60,5 +60,6 @@ fu_status_entry Fu_status::get_entry(fu_enum fu)
  * Why NUM_REGS + 1?
  * NUM_REGS = 16 general purpose register + 1 ax register
  * Core class constructor initialises the array with value fu_enum::DMY
+ * It stores which reservation statiion will write result into the register
  */
 inline std::array<fu_enum, NUM_REGS + 1> reg_status;
