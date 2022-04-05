@@ -12,6 +12,7 @@
 #define FETCH_LOG
 #define DECODE_LOG
 #define ISSUE_LOG
+#define OP_FETCH_LOG
 #define EXECUTE_LOG
 #define RETIRE_LOG
 
