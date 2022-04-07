@@ -44,7 +44,7 @@ bool Op_fetch::read_operands(int fu_index)
 void Op_fetch::cycle()
 {
 	/* loop over all fu */
-	for (int i = 0; i < fu_status.size(); i++)
+	for (int i = 0; i < (int)fu_status.size(); i++)
 	{
 		/* Get the reference to current fu */
 		auto &fu_entry = fu_status[i];
