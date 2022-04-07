@@ -125,8 +125,6 @@ void Issue::cycle()
 		fu.qj = reg_status[instr.src_reg1];
 
 		fu.rj = fu.qj == fu_enum::DMY_FU;
-
-		reg_status[instr.dest_reg] = op_to_fu[op];
 		break;
 
 	case op_enum::HLT: /* HLT */
