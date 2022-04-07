@@ -27,6 +27,13 @@ struct fu_status_entry
 	 * it also signal the execution unit that it can perform operation
 	 */
 	bool fetched;
+	/*
+	 * has the fu executed
+	 * it also signals the retire unit that it can perform operation
+	 */
+	bool executed;
+	/* aluout value */
+	int aluout;
 	/* index of instruction (Stored for calculating pc for JMP and BEQZ) */
 	int idx;
 
@@ -40,7 +47,8 @@ void fu_status_entry::reset_entry()
 	fj = fk = fl = imm = fi = -1;
 	qj = qk = ql = DMY_FU;
 	rj = rk = rl = true;
-	fetched = false;
+	fetched = executed = false;
+	aluout = idx = 0;
 }
 
 /*
@@ -52,15 +60,16 @@ inline std::array<fu_status_entry, fu_enum::NUM_FU> fu_status;
 inline void dump_fu_entry(fu_enum fu)
 {
 	using namespace std;
-	auto &fu_entry = fu_status[fu];
+	auto &fue = fu_status[fu];
 
-	cout << "FU: " << fu << " busy: " << fu_entry.busy << endl;
-	cout << "Op: " << fu_entry.op << " isfetched: " << fu_entry.fetched << endl;
-	cout << "Src reg fj: " << fu_entry.fj << " fk: " << fu_entry.fk << " fl: " << fu_entry.fl << endl;
-	cout << "imm: " << fu_entry.imm << endl;
-	cout << "Dest reg fi: " << fu_entry.fi << endl;
-	cout << "FU prod qj: " << fu_entry.qj << " qk: " << fu_entry.qk << " ql: " << fu_entry.ql << endl;
-	cout << "Src reg ready rj: " << fu_entry.rj << " rk: " << fu_entry.rk << " rl: " << fu_entry.rl << endl;
+	cout << "FU: " << fu << " busy: " << fue.busy << endl;
+	cout << "Op: " << fue.op << " isfetched: " << fue.fetched << " isExecuted: " << fue.executed << endl;
+	cout << "Src reg fj: " << fue.fj << " fk: " << fue.fk << " fl: " << fue.fl << endl;
+	cout << "imm: " << fue.imm << endl;
+	cout << "Dest reg fi: " << fue.fi << endl;
+	cout << "FU prod qj: " << fue.qj << " qk: " << fue.qk << " ql: " << fue.ql << endl;
+	cout << "Src reg ready rj: " << fue.rj << " rk: " << fue.rk << " rl: " << fue.rl << endl;
+	cout << "aluout: " << fue.aluout << " idx: " << fue.idx << endl;
 }
 
 /*

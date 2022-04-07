@@ -3,119 +3,174 @@
 #include <iostream>
 
 #include "Register.hpp"
+#include "utils.hpp"
 
 class Execute
 {
+private:
+	/* ADD ADDI SUB SUBI LAX STX */
+	void alu_fu();
+	/* MUL MULI */
+	void mul_fu();
+	/* LD ST */
+	void ldst_fu();
+	/* JMP BEQZ */
+	void brch_fu();
+	/* HLT */
+	void util_fu();
+
 public:
 	void cycle();
 };
 
-void Execute::cycle()
+void Execute::alu_fu()
 {
-	/* Check if control register is valid (value isn't garbage) */
-	if (!RegSet::cr.valid)
-		return;
+	auto &fue = fu_status[fu_enum::ALU_FU];
 
-	RegSet::bt = false;
-	switch (RegSet::cr.value)
+	if (fue.busy && fue.fetched && !fue.executed)
 	{
-	case op_enum::ADD:
-	case op_enum::ADDI:
-		RegSet::dr.value = RegSet::ir1;
-		RegSet::dr.is_memory = false;
-		RegSet::aluout.value = RegSet::ir2 + RegSet::ir3;
-		break;
+		switch (fue.op)
+		{
+		/* Store result of ALU OP in aluout */
+		case op_enum::ADD:
+			fue.aluout = fue.fj + fue.fk;
+			break;
+		case op_enum::ADDI:
+			fue.aluout = fue.fj + fue.imm;
+			break;
+		case op_enum::SUB:
+			fue.aluout = fue.fj - fue.fk;
+			break;
+		case op_enum::SUBI:
+			fue.aluout = fue.fj - fue.imm;
+			break;
+		case op_enum::LAX:
+			fue.aluout = fue.fj;
+			break;
+		case op_enum::STX:
+			fue.aluout = fue.fj;
+			break;
+		default:
+			std::cerr << "Error: unknown ALU operation: " << fue.op << std::endl;
+			exit(EXIT_FAILURE);
+		}
 
-	case op_enum::SUB:
-	case op_enum::SUBI:
-		RegSet::dr.value = RegSet::ir1;
-		RegSet::dr.is_memory = false;
-		RegSet::aluout.value = RegSet::ir2 - RegSet::ir3;
-		break;
+		fue.executed = true;
+	}
+}
 
-	case op_enum::MUL:
-	case op_enum::MULI:
-		RegSet::dr.value = RegSet::ir1;
-		RegSet::dr.is_memory = false;
-		RegSet::aluout.value = RegSet::ir2 * RegSet::ir3;
-		break;
+void Execute::mul_fu()
+{
+	auto &fue = fu_status[fu_enum::MUL_FU];
 
-	case op_enum::LD:
-		RegSet::dr.value = RegSet::ir1;
-		RegSet::dr.is_memory = true;
-		RegSet::dr.is_store = false;
-		RegSet::aluout.value = RegSet::ir2 + RegSet::ir3;
-		break;
+	if (fue.busy && fue.fetched && !fue.executed)
+	{
+		switch (fue.op)
+		{
+		/* Store result of ALU OP in aluout */
+		case op_enum::MUL:
+			fue.aluout = fue.fj * fue.fk;
+			break;
+		case op_enum::MULI:
+			fue.aluout = fue.fj * fue.imm;
+			break;
+		default:
+			std::cerr << "Error: unknown MUL operation: " << fue.op << std::endl;
+			exit(EXIT_FAILURE);
+		}
+		fue.executed = true;
+	}
+}
 
-	case op_enum::ST:
-		RegSet::dr.value = RegSet::ir1 + RegSet::ir2;
-		RegSet::dr.is_memory = true;
-		RegSet::dr.is_store = true;
-		RegSet::aluout.value = RegSet::ir3;
-		break;
+void Execute::ldst_fu()
+{
+	auto &fue = fu_status[fu_enum::LDST_FU];
 
-	case op_enum::LAX:
-		/* 17th register is ax register */
-		RegSet::dr.value = 16;
-		RegSet::dr.is_memory = false;
-		RegSet::aluout.value = RegSet::ir1;
-		break;
+	if (fue.busy && fue.fetched && !fue.executed)
+	{
+		switch (fue.op)
+		{
+		case op_enum::LD: /* LD R1 R2[R3] */
+			/* Store R2[R3] in aluout, retire unit has to put [aluout] to fi */
+			fue.aluout = fue.fj + fue.fk;
+			break;
 
-	case op_enum::STX:
-		RegSet::dr.value = RegSet::ir1;
-		RegSet::dr.is_memory = false;
-		RegSet::aluout.value = RegSet::ir2;
-		break;
+		case op_enum::ST: /* ST R1[R2] R3 */
+				  /* Store R1[R2] in aluout, retire unit has to put fl to [aluout] */
+			fue.aluout = fue.fj + fue.fk;
+			break;
 
-	/*
-	 * Why (RegSet::pc - 2)?
-	 * Because the instruction was fetched two cycle ago hence the pc value
-	 * must have been increased by 2 when the instruction was fetched and now
-	 * it is in execute stage hence we must have to decrease it by 2 to get
-	 * the correct pc value
-	 *
-	 * For jmp or branch instruction
-	 * we consider an address difference of 2 bytes (in our assembler implementation)
-	 * between instruction
-	 * but, we are storing instruction in an array so we don't need the 2 byte offset
-	 */
-	case op_enum::JMP:
-		/* branch instr */
-		RegSet::bt = true;
-		RegSet::aluout.value = RegSet::pc - 2 + RegSet::ir1 / 2;
-		break;
+		default:
+			std::cerr << "Error: unknown LDST operation: " << fue.op << std::endl;
+			exit(EXIT_FAILURE);
+			break;
+		}
+		fue.executed = true;
+	}
+}
 
-	case op_enum::BEQZ:
-		/* branch instr */
-		RegSet::bt = true;
+void Execute::brch_fu()
+{
+	auto &fue = fu_status[fu_enum::BRCH_FU];
+
+	if (fue.busy && fue.fetched && !fue.executed)
+	{
+		switch (fue.op)
+		{
+		/*
+		 * why fue.imm / 2?
+		 * For jmp or branch instruction we consider an
+		 * address difference of 2 bytes (in our assembler implementation)
+		 * between instruction
+		 * but, we are storing instruction in an array so we don't need the 2 byte offset
+		 */
+		case op_enum::JMP:
+			fue.aluout = fue.idx + fue.imm / 2;
+			break;
 		/*
 		 * Why RegSet::pc + 1?
 		 * aluout value will be used in next cycle in retire stage, in that cycle pc will
 		 * be incremented by 1 so, wrong instruction will be fetched hence save incremented
 		 * pc value in alu output
 		 */
-		RegSet::aluout.value = (RegSet::ir1 == 0) ? (RegSet::pc - 2 + RegSet::ir2 / 2) : (RegSet::pc + 1);
-		break;
+		case op_enum::BEQZ:
+			fue.aluout = (fue.fj == 0) ? (fue.idx + fue.imm / 2) : (RegSet::pc + 1);
+			break;
 
-	case op_enum::HLT:
-		RegSet::is_halt_instr = true;
-		break;
-
-	default:
-		std::cerr << "Invalid opcode: " << RegSet::cr.value << std::endl;
-		exit(EXIT_FAILURE);
-		break;
+		default:
+			std::cerr << "Error: unknown BRCH operation: " << fue.op << std::endl;
+			exit(EXIT_FAILURE);
+			break;
+		}
+		fue.executed = true;
 	}
-	RegSet::aluout.valid = true;
+}
+
+void Execute::util_fu()
+{
+	auto &fue = fu_status[fu_enum::UTIL_FU];
+	if (fue.busy && fue.fetched && !fue.executed)
+	{
+		/* No need to do anything */
+		if (fue.op != op_enum::HLT)
+		{
+			std::cerr << "Error: HLT operation expected: " << fue.op << std::endl;
+			exit(EXIT_FAILURE);
+		}
+		fue.executed = true;
+	}
+}
+
+void Execute::cycle()
+{
+	/* Simulating all fu as they are running in parallel */
+	this->alu_fu();
+	this->mul_fu();
+	this->ldst_fu();
+	this->brch_fu();
+	this->util_fu();
 
 #ifdef EXECUTE_LOG
-	std::cout << "Execute: " << std::endl;
-	std::cout << "aluout: " << RegSet::aluout.value << "\tbt: " << RegSet::bt << "\tdr: " << RegSet::dr.value << (RegSet::dr.is_memory ? "M" : "R") << std::endl;
+	// TODO: Execute log
 #endif
-
-	/*
-	 * Execute unit consumed current instruction so set cr validity to false
-	 * in the next decode cycle it will be set to true by decode unit
-	 */
-	RegSet::reset_decode_execute_im();
 }
