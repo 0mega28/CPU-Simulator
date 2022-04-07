@@ -18,6 +18,11 @@
 * All rights reserved
 */
 
+#define MAX_4_BIT_SIGNED 7	/* 0111 */
+#define MIN_4_BIT_SIGNED -8	/* 1000 */
+#define MAX_12_BIT_SIGNED 4095	/* 0111-1111-1111 */
+#define MIN_12_BIT_SIGNED -4096 /* 1000-0000-0000 */
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -165,6 +170,15 @@ std::string gen_bin_from_instr(std::string operand, std::string rd,
 	return opcode + rd_bin + rs_bin + imme_bin;
 }
 
+void assert_and_exit(bool cond, std::string msg)
+{
+	if (!cond)
+	{
+		std::cerr << msg << std::endl;
+		exit(EXIT_FAILURE);
+	}
+}
+
 /* Conversion into opcode takes place */
 void translate(std::string bin_file)
 {
@@ -200,6 +214,12 @@ void translate(std::string bin_file)
 				opcode += "I";
 
 				int imm_val = std::stoi(imm.substr(1));
+
+
+				std::string assert_msg = "Error: Line=" + std::to_string(ip + 1) +
+							 ": " + "Immediate value " + imm + " is out of range.";
+				assert_and_exit(imm_val >= MIN_4_BIT_SIGNED &&
+				       imm_val <= MAX_4_BIT_SIGNED, assert_msg);
 
 				bin_out = gen_bin_from_instr(opcode, rd,
 							     rs, imm_val);
@@ -271,6 +291,12 @@ void translate(std::string bin_file)
 				ss >> imm;
 
 				int imm_val = std::stoi(imm.substr(1));
+
+				std::string assert_msg = "Error: Line=" + std::to_string(ip + 1) +
+							 ": " + "Immediate value " + imm + " is out of range.";
+				assert_and_exit(imm_val >= MIN_12_BIT_SIGNED &&
+				       imm_val <= MAX_12_BIT_SIGNED, assert_msg);
+
 				bin_out = opcode_map[opcode] +
 					  int_to_bin(12, imm_val);
 			}
