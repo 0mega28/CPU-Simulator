@@ -73,6 +73,9 @@ void RegSet::reset_fetch_decode_im()
 // TODO: change reset function call
 void RegSet::flush_pipeline()
 {
+	reset_fetch_decode_im();
+	/* Empty the instr queue */
+	iq = {};
 }
 
 // TODO: check this function for correct dump of register as there will be
