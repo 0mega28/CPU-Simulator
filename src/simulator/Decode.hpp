@@ -25,6 +25,8 @@ void Decode::cycle()
 	iq_entry iqe;
 	/* Add the opcode entry to iq entry */
 	iqe.op = (op_enum)i->getOpcode();
+	/* Add index to iqe */
+	iqe.idx = i->getIdx();
 
 	/* Decode instruction and store in intermediate registers */
 	switch (i->getOpcode())

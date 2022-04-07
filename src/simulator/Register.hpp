@@ -37,6 +37,7 @@ struct iq_entry
 	int src_reg3;
 	int dest_reg;
 	int imm_val;
+	int idx;
 };
 
 class RegSet

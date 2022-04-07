@@ -35,6 +35,7 @@ public:
 		while (getline(newfile, binaryInstruction))
 		{
 			Instruction *i = new Instruction(binaryInstruction);
+			i->setIdx(totalInstructions); /* idx of instr */
 			instructionCache[totalInstructions++] = i;
 		}
 	}

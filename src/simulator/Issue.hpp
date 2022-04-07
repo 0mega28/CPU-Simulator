@@ -41,6 +41,8 @@ void Issue::cycle()
 	/* Set fu state to busy (Removes structural hazards) and op */
 	fu.busy = true;
 	fu.op = op;
+	/* Set index entry in fue */
+	fu.idx = instr.idx;
 
 	/* Assign fu according to op */
 	switch (op)

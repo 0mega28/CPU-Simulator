@@ -27,6 +27,8 @@ struct fu_status_entry
 	 * it also signal the execution unit that it can perform operation
 	 */
 	bool fetched;
+	/* index of instruction (Stored for calculating pc for JMP and BEQZ) */
+	int idx;
 
 	void reset_entry();
 };
