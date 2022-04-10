@@ -164,16 +164,13 @@ void Retire::write_back(fu_enum fu)
 
 	/* fu has finished */
 	fue.busy = false;
+#ifdef RETIRE_LOG
+	std::cout << "Retire: " << fue.idx << std::endl;
+#endif
 }
 
 void Retire::cycle()
 {
-
-#ifdef RETIRE_LOG
-	std::cout << "Retire: \n"
-		  << std::endl;
-	// TODO retire log
-#endif
 
 	/*
 	 * this will simulate parallel write back of all fu
