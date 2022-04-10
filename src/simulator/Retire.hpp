@@ -53,6 +53,14 @@ bool Retire::check_war(fu_enum fu)
 			continue;
 
 		auto &fue_f = fu_status[f];
+
+		/* The current instruction to be retired should
+		have higher index than an instruction for WAR to be possible.
+		Since only busy status of functional unit is reset in our code after
+		retiring, so the FU must be busy for WAR to be possible. */
+		if (fue.idx < fue_f.idx || !fue_f.busy)
+			continue;
+
 		int fj_f = fue_f.fj;
 		int fk_f = fue_f.fk;
 		int fl_f = fue_f.fl;
@@ -140,7 +148,7 @@ void Retire::write_back(fu_enum fu)
 		break;
 
 	case fu_enum::UTIL_FU:
-	 	/* Check if all other fu have finished their execution */
+		/* Check if all other fu have finished their execution */
 		for (int f = 0; f < fu_enum::NUM_FU; f++)
 			if (f != fu && fu_status[f].busy)
 				return;
@@ -162,7 +170,8 @@ void Retire::cycle()
 {
 
 #ifdef RETIRE_LOG
-	std::cout << "Retire: " << std::endl;
+	std::cout << "Retire: \n"
+		  << std::endl;
 	// TODO retire log
 #endif
 
