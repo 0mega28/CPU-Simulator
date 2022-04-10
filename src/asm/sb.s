@@ -1,4 +1,4 @@
-ADD R6 R0 #9
+ADD R6 R0 #4
 ; R6 = 4
 ADD R2 R0 #5
 ; R2 = 5
