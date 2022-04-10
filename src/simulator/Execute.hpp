@@ -3,11 +3,14 @@
 #include <iostream>
 
 #include "Register.hpp"
-#include "utils.hpp"
+#include "../utils.hpp"
 
 class Execute
 {
 private:
+	/* Functional units that execute in this cycle */
+	std::array<bool, fu_enum::NUM_FU> fu_exec;
+
 	/* ADD ADDI SUB SUBI LAX STX */
 	void alu_fu();
 	/* MUL MULI */
@@ -18,6 +21,9 @@ private:
 	void brch_fu();
 	/* HLT */
 	void util_fu();
+
+	void reset_exec_status();
+	void dump_exec();
 
 public:
 	void cycle();
@@ -56,6 +62,7 @@ void Execute::alu_fu()
 		}
 
 		fue.executed = true;
+		fu_exec[fu_enum::ALU_FU] = true;
 	}
 }
 
@@ -78,7 +85,9 @@ void Execute::mul_fu()
 			std::cerr << "Error: unknown MUL operation: " << fue.op << std::endl;
 			exit(EXIT_FAILURE);
 		}
+
 		fue.executed = true;
+		fu_exec[fu_enum::MUL_FU] = true;
 	}
 }
 
@@ -106,6 +115,7 @@ void Execute::ldst_fu()
 			break;
 		}
 		fue.executed = true;
+		fu_exec[fu_enum::LDST_FU] = true;
 	}
 }
 
@@ -143,6 +153,7 @@ void Execute::brch_fu()
 			break;
 		}
 		fue.executed = true;
+		fu_exec[fu_enum::BRCH_FU] = true;
 	}
 }
 
@@ -158,7 +169,29 @@ void Execute::util_fu()
 			exit(EXIT_FAILURE);
 		}
 		fue.executed = true;
+		fu_exec[fu_enum::UTIL_FU] = true;
 	}
+}
+
+void Execute::reset_exec_status()
+{
+	for (int i = 0; i < fu_enum::NUM_FU; i++)
+		fu_exec[i] = false;
+}
+
+void Execute::dump_exec()
+{
+	using namespace std;
+	for (int i = 0; i < fu_enum::NUM_FU; i++)
+	{
+		if (fu_exec[i])
+		{
+			auto &fue = fu_status[i];
+			cout << "Functional unit: " << i << endl;
+			cout << "Alu output = " << fue.aluout << endl;
+		}
+	}
+	cout << endl;
 }
 
 void Execute::cycle()
@@ -171,6 +204,8 @@ void Execute::cycle()
 	this->util_fu();
 
 #ifdef EXECUTE_LOG
-	// TODO: Execute log
+	std::cout << "Execute:" << std::endl;
+	dump_exec();
 #endif
+	reset_exec_status();
 }
