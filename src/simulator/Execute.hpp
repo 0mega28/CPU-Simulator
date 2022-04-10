@@ -51,7 +51,7 @@ void Execute::alu_fu()
 			fue.aluout = fue.fj - fue.imm;
 			break;
 		case op_enum::LAX:
-			fue.aluout = fue.fj;
+			fue.aluout = fue.imm;
 			break;
 		case op_enum::STX:
 			fue.aluout = fue.fj;
