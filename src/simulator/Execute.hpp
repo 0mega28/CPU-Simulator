@@ -31,10 +31,19 @@ public:
 
 void Execute::alu_fu()
 {
+	static int alu_delay = ALU_DELAY;
 	auto &fue = fu_status[fu_enum::ALU_FU];
 
 	if (fue.busy && fue.fetched && !fue.executed)
 	{
+		if (alu_delay != 0)
+		{
+			alu_delay--;
+			return;
+		}
+		else
+			alu_delay = ALU_DELAY;
+
 		switch (fue.op)
 		{
 		/* Store result of ALU OP in aluout */
@@ -68,10 +77,19 @@ void Execute::alu_fu()
 
 void Execute::mul_fu()
 {
+	static int mul_delay = MUL_DELAY;
 	auto &fue = fu_status[fu_enum::MUL_FU];
 
 	if (fue.busy && fue.fetched && !fue.executed)
 	{
+		if (mul_delay != 0)
+		{
+			mul_delay--;
+			return;
+		}
+		else
+			mul_delay = MUL_DELAY;
+
 		switch (fue.op)
 		{
 		/* Store result of ALU OP in aluout */
@@ -93,10 +111,19 @@ void Execute::mul_fu()
 
 void Execute::ldst_fu()
 {
+	static int ldst_delay = LDST_DELAY;
 	auto &fue = fu_status[fu_enum::LDST_FU];
 
 	if (fue.busy && fue.fetched && !fue.executed)
 	{
+		if (ldst_delay != 0)
+		{
+			ldst_delay--;
+			return;
+		}
+		else
+			ldst_delay = LDST_DELAY;
+
 		switch (fue.op)
 		{
 		case op_enum::LD: /* LD R1 R2[R3] */
@@ -121,10 +148,19 @@ void Execute::ldst_fu()
 
 void Execute::brch_fu()
 {
+	static int brch_delay = BRCH_DELAY;
 	auto &fue = fu_status[fu_enum::BRCH_FU];
 
 	if (fue.busy && fue.fetched && !fue.executed)
 	{
+		if (brch_delay != 0)
+		{
+			brch_delay--;
+			return;
+		}
+		else
+			brch_delay = BRCH_DELAY;
+
 		switch (fue.op)
 		{
 		/*
@@ -159,9 +195,17 @@ void Execute::brch_fu()
 
 void Execute::util_fu()
 {
+	static int util_delay = UTIL_DELAY;
 	auto &fue = fu_status[fu_enum::UTIL_FU];
 	if (fue.busy && fue.fetched && !fue.executed)
 	{
+		if (util_delay != 0)
+		{
+			util_delay--;
+			return;
+		}
+		else
+			util_delay = UTIL_DELAY;
 		/* No need to do anything */
 		if (fue.op != op_enum::HLT)
 		{

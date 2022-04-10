@@ -16,6 +16,12 @@
 #define EXECUTE_LOG
 #define RETIRE_LOG
 
+#define ALU_DELAY 2
+#define MUL_DELAY 5
+#define BRCH_DELAY 3
+#define LDST_DELAY 10
+#define UTIL_DELAY 0
+
 /* Returns binary string of an interger value */
 std::string int_to_bin(int bits, int value);
 
