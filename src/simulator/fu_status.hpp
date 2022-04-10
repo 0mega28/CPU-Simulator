@@ -70,6 +70,7 @@ inline void dump_fu_entry(fu_enum fu)
 	cout << "FU prod qj: " << fue.qj << " qk: " << fue.qk << " ql: " << fue.ql << endl;
 	cout << "Src reg ready rj: " << fue.rj << " rk: " << fue.rk << " rl: " << fue.rl << endl;
 	cout << "aluout: " << fue.aluout << " idx: " << fue.idx << endl;
+	cout << endl;
 }
 
 /*
