@@ -77,6 +77,18 @@ inline void dump_fu_entry(fu_enum fu)
  * Why NUM_REGS + 1?
  * NUM_REGS = 16 general purpose register + 1 ax register
  * Core class constructor initialises the array with value fu_enum::DMY_FU
- * It stores which reservation statiion will write result into the register
+ * It stores which functional unit will write result into the register
  */
 inline std::array<fu_enum, NUM_REGS + 1> reg_status;
+
+inline void flush_fu_after_branch_taken(int idx)
+{
+	for(int f = 0; f < fu_enum::NUM_FU; f++ ){
+		if(fu_status[f].idx > idx)
+		{
+			reg_status[fu_status[f].fi] = fu_enum::DMY_FU;
+			fu_status[f].reset_entry();
+		}
+			
+	}
+}

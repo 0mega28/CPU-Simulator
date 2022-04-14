@@ -172,6 +172,7 @@ void Execute::brch_fu()
 		 */
 		case op_enum::JMP:
 			fue.aluout = fue.idx + fue.imm / 2;
+			RegSet::branch_taken = true;
 			break;
 		/*
 		 * Why RegSet::pc + 1?
@@ -181,6 +182,7 @@ void Execute::brch_fu()
 		 */
 		case op_enum::BEQZ:
 			fue.aluout = (fue.fj == 0) ? (fue.idx + fue.imm / 2) : (RegSet::pc + 1);
+			RegSet::branch_taken = fue.fj == 0;
 			break;
 
 		default:

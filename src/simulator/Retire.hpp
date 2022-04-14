@@ -97,6 +97,11 @@ void Retire::free_fu(fu_enum fu)
 void Retire::write_back(fu_enum fu)
 {
 	auto &fue = fu_status[fu];
+
+	/* Don't retire if there is unresolved branch */
+	if (fu_status[fu_enum::BRCH_FU].busy && fu_status[fu].idx > fu_status[fu_enum::BRCH_FU].idx)
+		return;
+
 	/* check if fu has been assigned (check busy) and has executed */
 	if (!fue.busy || !fue.executed)
 		return;
@@ -135,16 +140,21 @@ void Retire::write_back(fu_enum fu)
 		break;
 
 	case fu_enum::BRCH_FU:
-		if (RegSet::pc != fue.aluout)
+		if (RegSet::branch_taken)
 		{
 			/* branch has to be taken */
+			std::cout << RegSet::pc << std::endl;
 			RegSet::pc = fue.aluout;
 #ifdef RETIRE_LOG
 			std::cout << "Retire: " << std::endl;
-			std::cout << "Branch taken: " << RegSet::pc << " Flushing pipeline" << std::endl;
+			std::cout << "Branch taken: " << RegSet::pc << "alu output= " << fue.aluout << " Flushing pipeline" << std::endl;
 #endif
 			RegSet::flush_pipeline();
+			flush_fu_after_branch_taken(fue.idx);
+			RegSet::branch_taken = false;
 		}
+		else
+			std::cout << "Branch not taken, moving on normally" << std::endl;
 		break;
 
 	case fu_enum::UTIL_FU:

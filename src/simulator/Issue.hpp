@@ -32,7 +32,7 @@ void Issue::cycle()
 	 * If the current destination register is produced by some other
 	 * function unit do nothing (Removes WAW data hazards)
 	 */
-	if (reg_status[instr.dest_reg] != fu_enum::DMY_FU)
+	if (instr.dest_reg != -1 && reg_status[instr.dest_reg] != fu_enum::DMY_FU)
 		return;
 
 	/* Reset the current fu entry */
