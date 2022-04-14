@@ -11,6 +11,7 @@ private:
 	int op1;
 	int op2;
 	int op3;
+	int idx; /* index of instruction */
 
 public:
 	Instruction(std::string binaryInstruction);
@@ -22,6 +23,9 @@ public:
 	int getop2() { return op2; }
 
 	int getop3() { return op3; }
+
+	void setIdx(int idx) { this->idx = idx; }
+	int getIdx() { return idx; }
 
 	void dumpInstruction();
 };
@@ -100,5 +104,5 @@ Instruction::Instruction(std::string binaryInstruction)
 
 void Instruction::dumpInstruction()
 {
-	std::cout << "OPCODE: " << op_string[opcode] << "\tOP1: " << op1 << "\tOP2: " << op2 << "\tOP3: " << op3 << std::endl;
+	std::cout << "OPCODE: " << op_string[opcode] << "\tOP1: " << op1 << "\tOP2: " << op2 << "\tOP3: " << op3 << "\t idx" << idx << "\n" << std::endl;
 }

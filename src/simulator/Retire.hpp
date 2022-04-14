@@ -4,11 +4,30 @@
 
 #include "DataMemory.hpp"
 #include "Register.hpp"
+#include "fu_status.hpp"
 #include "../utils.hpp"
 
 class Retire
 {
 	DataMemory *dataMemory;
+	void write_back(fu_enum fu);
+
+	/*
+	 * wait until no other instruction is going to read register destination
+	 * returns true if war dependency exist else false
+	 *
+	 * Suppose two instr in order
+	 * MUL R1, R2, R3
+	 * ADD R2, R3, R4
+	 * ADD instr should not write back before MUL instr has fetched the src reg
+	 */
+	bool check_war(fu_enum fu);
+
+	/*
+	 * free all other_fu which are waiting for the current_fu to finish
+	 * set all r* of other_fu to true if q* of other_fu == current_fu
+	 */
+	void free_fu(fu_enum fu);
 
 public:
 	Retire(DataMemory *dataMemory);
@@ -21,77 +40,152 @@ Retire::Retire(DataMemory *dataMemory)
 	this->dataMemory = dataMemory;
 }
 
-void Retire::cycle()
+bool Retire::check_war(fu_enum fu)
 {
-	/* Check if execute unit output is valid (value isn't garbage) */
-	if (!RegSet::aluout.valid)
+	/* Get the current fu status entry */
+	auto &fue = fu_status[fu];
+	int fi = fue.fi;
+
+	/* loop over all fu */
+	for (int f = 0; f < fu_enum::NUM_FU; f++)
+	{
+		if (f == fu) /* Obviously, we don't need to check for curr fu */
+			continue;
+
+		auto &fue_f = fu_status[f];
+
+		/* The current instruction to be retired should
+		have higher index than an instruction for WAR to be possible.
+		Since only busy status of functional unit is reset in our code after
+		retiring, so the FU must be busy for WAR to be possible. */
+		if (fue.idx < fue_f.idx || !fue_f.busy)
+			continue;
+
+		int fj_f = fue_f.fj;
+		int fk_f = fue_f.fk;
+		int fl_f = fue_f.fl;
+		bool fetched_f = fue_f.fetched;
+
+		/* current fu has to write to some reg */
+		bool is_write = fi != -1;
+		/* dest reg of current fu matches to src reg of some fu */
+		bool war = (fj_f == fi) || (fk_f == fi) || (fl_f == fi);
+
+		if (is_write && war && !fetched_f)
+			return true;
+	}
+	return false;
+}
+
+void Retire::free_fu(fu_enum fu)
+{
+	for (int f = 0; f < fu_enum::NUM_FU; f++)
+	{
+		if (f == fu) /* Obviously, we don't need to anything for curr fu */
+			continue;
+
+		auto &fue_f = fu_status[f];
+		if (fue_f.qj == fu)
+			fue_f.rj = true;
+		if (fue_f.qk == fu)
+			fue_f.rk = true;
+		if (fue_f.ql == fu)
+			fue_f.rl = true;
+	}
+}
+
+void Retire::write_back(fu_enum fu)
+{
+	auto &fue = fu_status[fu];
+
+	/* Don't retire if there is unresolved branch */
+	if (fu_status[fu_enum::BRCH_FU].busy && fu_status[fu].idx > fu_status[fu_enum::BRCH_FU].idx)
 		return;
 
-	/* Halt instruction stop pipeline */
-	if (RegSet::is_halt_instr)
-		longjmp(halt_cpu, 1);
+	/* check if fu has been assigned (check busy) and has executed */
+	if (!fue.busy || !fue.executed)
+		return;
 
-	if (RegSet::bt)
+	/* if there is a war dependency no need to do anything */
+	if (this->check_war(fu))
+		return;
+
+	switch (fu)
 	{
-		/* Branch instruction*/
+	case fu_enum::ALU_FU:
+	case fu_enum::MUL_FU:
+		this->free_fu(fu);
+		reg_status[fue.fi] = fu_enum::DMY_FU;
+		RegSet::gpr[fue.fi] = fue.aluout;
+		break;
 
-		int old_pc = RegSet::pc;
-		RegSet::pc = RegSet::aluout.value;
-
-		/* Flush the pipeline if branch is taken */
-		if (old_pc != RegSet::aluout.value)
+	case fu_enum::LDST_FU:
+		switch (fue.op)
 		{
+		case op_enum::LD:
+			this->free_fu(fu);
+			reg_status[fue.fi] = fu_enum::DMY_FU;
+			RegSet::gpr[fue.fi] = this->dataMemory->getData(fue.aluout);
+			break;
+		case op_enum::ST:
+			/* ST doesn't stop any fu */
+			this->dataMemory->setData(fue.aluout, fue.fl);
+			break;
+
+		default:
+			std::cerr << "Invalid op_enum in LDST: " << fue.op << std::endl;
+			exit(EXIT_FAILURE);
+			break;
+		}
+		break;
+
+	case fu_enum::BRCH_FU:
+		if (RegSet::branch_taken)
+		{
+			/* branch has to be taken */
+			std::cout << RegSet::pc << std::endl;
+			RegSet::pc = fue.aluout;
 #ifdef RETIRE_LOG
 			std::cout << "Retire: " << std::endl;
-			std::cout << "Branch taken: " << RegSet::pc << " Flushing pipeline" << std::endl;
+			std::cout << "Branch taken: " << RegSet::pc << "alu output= " << fue.aluout << " Flushing pipeline" << std::endl;
 #endif
 			RegSet::flush_pipeline();
-			return;
-		}
-	}
-	else
-	{
-		/* Not a branch instruction */
-		if (RegSet::dr.is_memory)
-		{
-			/* Memory access required */
-
-			/* Store aluout in memory location dr.value */
-			if (RegSet::dr.is_store)
-			{ /* Store instruction */
-				dataMemory->setData(RegSet::dr.value, RegSet::aluout.value);
-			}
-			/* Load value from memory location aluout in register dr.value */
-			else
-			{ /* Load instruction */
-				RegSet::gpr[RegSet::dr.value] = dataMemory->getData(RegSet::aluout.value);
-
-				/* Set register as valid */
-				RegSet::reg_valid[RegSet::dr.value] = true;
-			}
+			flush_fu_after_branch_taken(fue.idx);
+			RegSet::branch_taken = false;
 		}
 		else
-		{
-			/* Memory acceess not required */
+			std::cout << "Branch not taken, moving on normally" << std::endl;
+		break;
 
-			/* Directly store aluout in register dr.value */
-			RegSet::gpr[RegSet::dr.value] = RegSet::aluout.value;
+	case fu_enum::UTIL_FU:
+		/* Check if all other fu have finished their execution */
+		for (int f = 0; f < fu_enum::NUM_FU; f++)
+			if (f != fu && fu_status[f].busy)
+				return;
 
-			/* Set register as valid */
-			RegSet::reg_valid[RegSet::dr.value] = true;
-		}
+		longjmp(halt_cpu, 1); /* HLT instr */
+
+		break;
+
+	default:
+		std::cerr << "Error: unknown fu: " << fu << std::endl;
+		exit(EXIT_FAILURE);
 	}
 
+	/* fu has finished */
+	fue.busy = false;
 #ifdef RETIRE_LOG
-	std::cout << "Retire: " << std::endl;
-	std::cout << "bt: " << RegSet::bt << "\tpc: " << RegSet::pc << std::endl;
-	std::cout << "dr: " << RegSet::dr.value << "\t" << RegSet::dr.is_memory << "\t" << RegSet::dr.is_store << std::endl;
-	std::cout << "aluout: " << RegSet::aluout.value << "\t" << std::endl;
+	std::cout << "Retire: " << fue.idx << std::endl;
 #endif
+}
+
+void Retire::cycle()
+{
 
 	/*
-	 * Retire unit consumed current instruction so set aluout validity to false
-	 * in the next execute cycle it will be set to true by execute unit
+	 * this will simulate parallel write back of all fu
+	 * as it is done in a single CPU cycle
 	 */
-	RegSet::reset_execute_retire_im();
+	for (int f = 0; f < fu_enum::NUM_FU; f++)
+		this->write_back((fu_enum)f);
 }

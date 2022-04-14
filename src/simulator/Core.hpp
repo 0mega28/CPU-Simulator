@@ -5,11 +5,14 @@
 
 #include "Fetch.hpp"
 #include "Decode.hpp"
+#include "Issue.hpp"
+#include "Op_fetch.hpp"
 #include "Execute.hpp"
 #include "Retire.hpp"
 #include "Register.hpp"
 #include "InstructionMemory.hpp"
 #include "DataMemory.hpp"
+#include "fu_status.hpp"
 #include "../utils.hpp"
 
 class Core
@@ -17,6 +20,8 @@ class Core
 private:
 	Fetch *fetch;
 	Decode *decode;
+	Issue *issue;
+	Op_fetch *op_fetch;
 	Execute *execute;
 	Retire *retire;
 
@@ -42,8 +47,14 @@ Core::Core(std::string binFile)
 
 	this->fetch = new Fetch(this->instructionMemory);
 	this->decode = new Decode();
+	this->issue = new Issue();
+	this->op_fetch = new Op_fetch();
 	this->execute = new Execute();
 	this->retire = new Retire(this->dataMemory);
+
+	/* Initialize fu status and reg status */
+	fu_status.fill({.busy = false});
+	reg_status.fill(fu_enum::DMY_FU);
 }
 
 Core::~Core()
@@ -53,6 +64,8 @@ Core::~Core()
 
 	delete this->fetch;
 	delete this->decode;
+	delete this->issue;
+	delete this->op_fetch;
 	delete this->execute;
 	delete this->retire;
 }
@@ -61,6 +74,8 @@ void Core::_cycle()
 {
 	this->retire->cycle();
 	this->execute->cycle();
+	this->op_fetch->cycle();
+	this->issue->cycle();
 	this->decode->cycle();
 	this->fetch->cycle();
 }
