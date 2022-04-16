@@ -61,6 +61,8 @@ void Decode::cycle()
 
 	case op_enum::JMP:		   /* JMP L1 */
 		iqe.imm_val = i->getop1(); /* L1 */
+		RegSet::pc = i->getIdx() + i->getop1() / 2;
+		return;
 		break;
 
 	case op_enum::STX:		    /* STX R1 */
