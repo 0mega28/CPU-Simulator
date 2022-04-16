@@ -84,7 +84,7 @@ void Decode::cycle()
 
 #ifdef DECODE_LOG
 	std::cout << "Decode: " << std::endl;
-	// TODO: handle decode log
+	i->dumpInstruction();
 #endif
 
 	RegSet::iq.push(iqe);

@@ -54,10 +54,12 @@ bool Retire::check_war(fu_enum fu)
 
 		auto &fue_f = fu_status[f];
 
-		/* The current instruction to be retired should
-		have higher index than an instruction for WAR to be possible.
-		Since only busy status of functional unit is reset in our code after
-		retiring, so the FU must be busy for WAR to be possible. */
+		/*
+		 * The current instruction to be retired should
+		 * have higher index than an instruction for WAR to be possible.
+		 * Since only busy status of functional unit is reset in our code after
+		 * retiring, so the FU must be busy for WAR to be possible.
+		 */
 		if (fue.idx < fue_f.idx || !fue_f.busy)
 			continue;
 

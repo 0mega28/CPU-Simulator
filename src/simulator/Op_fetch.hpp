@@ -56,10 +56,10 @@ void Op_fetch::cycle()
 #ifdef OP_FETCH_LOG
 			if (status)
 			{
-				std::cout<<"Operand Fetch: ("<<i<<")"<<std::endl;
+				std::cout << "Operand Fetch: FU(" << i << ")" << std::endl;
 				dump_fu_entry((fu_enum)i);
 			}
-				
+
 #endif
 		}
 	}

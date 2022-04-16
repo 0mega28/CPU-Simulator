@@ -63,7 +63,7 @@ inline void dump_fu_entry(fu_enum fu)
 	auto &fue = fu_status[fu];
 
 	cout << "FU: " << fu << " busy: " << fue.busy << endl;
-	cout << "Op: " << fue.op << " isfetched: " << fue.fetched << " isExecuted: " << fue.executed << endl;
+	cout << "Op: " << op_string[(int)fue.op] << " isfetched: " << fue.fetched << " isExecuted: " << fue.executed << endl;
 	cout << "Src reg fj: " << fue.fj << " fk: " << fue.fk << " fl: " << fue.fl << endl;
 	cout << "imm: " << fue.imm << endl;
 	cout << "Dest reg fi: " << fue.fi << endl;
@@ -83,12 +83,12 @@ inline std::array<fu_enum, NUM_REGS + 1> reg_status;
 
 inline void flush_fu_after_branch_taken(int idx)
 {
-	for(int f = 0; f < fu_enum::NUM_FU; f++ ){
-		if(fu_status[f].idx > idx)
+	for (int f = 0; f < fu_enum::NUM_FU; f++)
+	{
+		if (fu_status[f].idx > idx)
 		{
 			reg_status[fu_status[f].fi] = fu_enum::DMY_FU;
 			fu_status[f].reset_entry();
 		}
-			
 	}
 }
