@@ -8,6 +8,12 @@
 
 class Issue
 {
+private:
+	/* var to keep track of the time at which instr are issued */
+	unsigned int time = 0;
+	/* return and increment time var */
+	unsigned int getTime();
+
 public:
 	void cycle();
 };
@@ -136,6 +142,8 @@ void Issue::cycle()
 		break;
 	}
 
+	fu.time = this->getTime();
+
 #ifdef ISSUE_LOG
 	std::cout << "Issue: " << std::endl;
 	dump_fu_entry(op_to_fu[op]);
@@ -143,4 +151,9 @@ void Issue::cycle()
 
 	/* Instruction is assigned to fu so pop the instruction from queue */
 	RegSet::iq.pop();
+}
+
+unsigned int Issue::getTime()
+{
+	return this->time++;
 }

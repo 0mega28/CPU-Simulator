@@ -55,12 +55,12 @@ bool Retire::check_war(fu_enum fu)
 		auto &fue_f = fu_status[f];
 
 		/*
-		 * The current instruction to be retired should
-		 * have higher index than an instruction for WAR to be possible.
+		 * The current instruction to be retired should have higher time
+		 * at which it was issud than an instruction for WAR to be possible.
 		 * Since only busy status of functional unit is reset in our code after
 		 * retiring, so the FU must be busy for WAR to be possible.
 		 */
-		if (fue.idx < fue_f.idx || !fue_f.busy)
+		if (fue.time < fue_f.time || !fue_f.busy)
 			continue;
 
 		int fj_f = fue_f.fj;
@@ -100,8 +100,11 @@ void Retire::write_back(fu_enum fu)
 {
 	auto &fue = fu_status[fu];
 
-	/* Don't retire if there is unresolved branch */
-	if (fu_status[fu_enum::BRCH_FU].busy && fu_status[fu].idx > fu_status[fu_enum::BRCH_FU].idx)
+	/*
+	 * Don't retire the instruction which is fetched after the branch instruction
+	 * and if there is unresolved branch
+	 */
+	if (fu_status[fu_enum::BRCH_FU].busy && fu_status[fu].time > fu_status[fu_enum::BRCH_FU].time)
 		return;
 
 	/* check if fu has been assigned (check busy) and has executed */
@@ -152,7 +155,7 @@ void Retire::write_back(fu_enum fu)
 			std::cout << "Branch taken: " << RegSet::pc << "alu output= " << fue.aluout << " Flushing pipeline" << std::endl;
 #endif
 			RegSet::flush_pipeline();
-			flush_fu_after_branch_taken(fue.idx);
+			flush_fu_after_branch_taken(fue.time);
 			RegSet::branch_taken = false;
 		}
 		else

@@ -36,6 +36,8 @@ struct fu_status_entry
 	int aluout;
 	/* index of instruction (Stored for calculating pc for JMP and BEQZ) */
 	int idx;
+	/* time at which instr was issued */
+	unsigned int time;
 
 	void reset_entry();
 };
@@ -81,11 +83,15 @@ inline void dump_fu_entry(fu_enum fu)
  */
 inline std::array<fu_enum, NUM_REGS + 1> reg_status;
 
-inline void flush_fu_after_branch_taken(int idx)
+/*
+ * flush all the content of the functional units if they were issued
+ * after branch isntr(by checking time var) and branch was actually taken
+ */
+inline void flush_fu_after_branch_taken(unsigned int time)
 {
 	for (int f = 0; f < fu_enum::NUM_FU; f++)
 	{
-		if (fu_status[f].idx > idx)
+		if (fu_status[f].time > time)
 		{
 			reg_status[fu_status[f].fi] = fu_enum::DMY_FU;
 			fu_status[f].reset_entry();
