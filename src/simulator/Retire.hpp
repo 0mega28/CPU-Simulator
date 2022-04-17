@@ -145,21 +145,21 @@ void Retire::write_back(fu_enum fu)
 		break;
 
 	case fu_enum::BRCH_FU:
-		if (RegSet::branch_taken)
+		RegSet::decode_stall = false;
+		branch_predictor[fue.idx].update_state(RegSet::branch_taken);
+
+		/* if branch prediction was incorrect */
+		if (RegSet::branch_taken != branch_predictor[fue.idx].get_last_branch_prediction())
 		{
-			/* branch has to be taken */
-			std::cout << RegSet::pc << std::endl;
 			RegSet::pc = fue.aluout;
-#ifdef RETIRE_LOG
-			std::cout << "Retire: " << std::endl;
-			std::cout << "Branch taken: " << RegSet::pc << "alu output= " << fue.aluout << " Flushing pipeline" << std::endl;
-#endif
 			RegSet::flush_pipeline();
 			flush_fu_after_branch_taken(fue.time);
-			RegSet::branch_taken = false;
 		}
-		else
-			std::cout << "Branch not taken, moving on normally" << std::endl;
+		#ifdef RETIRE_LOG
+					std::cout << "Retire: " << std::endl;
+					std::cout << "Branch taken: " << RegSet::branch_taken << " alu output= " << fue.aluout << std::endl;
+		#endif
+		
 		break;
 
 	case fu_enum::UTIL_FU:
