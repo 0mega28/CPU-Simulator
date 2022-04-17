@@ -145,21 +145,26 @@ void Retire::write_back(fu_enum fu)
 		break;
 
 	case fu_enum::BRCH_FU:
-		RegSet::decode_stall = false;
-		branch_predictor[fue.idx].update_state(RegSet::branch_taken);
-
+		
 		/* if branch prediction was incorrect */
 		if (RegSet::branch_taken != branch_predictor[fue.idx].get_last_branch_prediction())
 		{
 			RegSet::pc = fue.aluout;
 			RegSet::flush_pipeline();
 			flush_fu_after_branch_taken(fue.time);
+			std::cout<< "Index= "<<fue.idx<<std::endl;
+		}
+		else
+		{
+			std::cout<<"Branch prediction correct, moving on. Index= " <<fue.idx << "Branch taken= " << RegSet::branch_taken << std::endl;
 		}
 		#ifdef RETIRE_LOG
 					std::cout << "Retire: " << std::endl;
 					std::cout << "Branch taken: " << RegSet::branch_taken << " alu output= " << fue.aluout << std::endl;
 		#endif
-		
+		RegSet::decode_stall = false;
+		branch_predictor[fue.idx].update_state(RegSet::branch_taken);
+
 		break;
 
 	case fu_enum::UTIL_FU:
@@ -180,7 +185,7 @@ void Retire::write_back(fu_enum fu)
 	/* fu has finished */
 	fue.busy = false;
 #ifdef RETIRE_LOG
-	std::cout << "Retire: " << fue.idx << std::endl;
+	std::cout << "Retire instruction idx: " << fue.idx << std::endl;
 #endif
 }
 
