@@ -56,6 +56,8 @@ private:
 	}
 
 public:
+	BranchPrediction() {}
+
 	BranchPrediction(int current_instruction_index, int target_index)
 	{
 		this->current_instruction_index = current_instruction_index;
@@ -69,12 +71,16 @@ public:
 
 	int get_target_address_index()
 	{
-		if(current_state <= NT)
+		if (current_state <= NT)
 			return current_instruction_index + 1;
-		else 
+		else
 			return target_index;
 	}
-	
+
+	bool get_last_branch_prediction()
+	{
+		return current_state >= 2;
+	}
 };
 
 inline std::unordered_map<int, BranchPrediction> branch_predictor;
