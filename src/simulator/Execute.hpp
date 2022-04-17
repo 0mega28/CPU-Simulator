@@ -163,12 +163,14 @@ void Execute::brch_fu()
 
 		switch (fue.op)
 		{
-		/*
-		 * why fue.imm / 2?
-		 * For jmp or branch instruction we consider an
-		 * address difference of 2 bytes (in our assembler implementation)
-		 * between instruction
-		 * but, we are storing instruction in an array so we don't need the 2 byte offset
+		/* 
+		 * Since our assembler has an instruction length of 16-bits,
+		 * i.e., 2 bytes, the program counter has to jump by 2 bytes
+		 * for every instruction.
+		 * 
+		 * As the insturctions are stored in an array, which is incremented
+		 * by 1 for every element, the effective immediate is halved when
+		 * storing in the array.
 		 */
 		case op_enum::JMP:
 			fue.aluout = fue.idx + fue.imm / 2;
