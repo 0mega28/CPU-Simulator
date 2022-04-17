@@ -5,12 +5,34 @@
 #include "Instruction.hpp"
 #include "Register.hpp"
 #include "../utils.hpp"
+#include "BranchPrediction.hpp"
+#include "fu_status.hpp"
 
 class Decode
 {
+private:
+	void create_branch_predictor_entry(int index, int offset);
+	/* Check if the current branch is already issued but not executed
+	If yes, stall the decode until it is executed */
+	bool check_fu_status_branch(int index);
 public:
 	void cycle();
 };
+
+void Decode::create_branch_predictor_entry(int index, int offset)
+{
+	if(branch_predictor.find(index) != branch_predictor.end())
+		return;
+	int target_address = index + offset/2;
+
+	branch_predictor[index] = BranchPrediction(index, target_address);
+}
+
+/* Check if the given branch instruction is issued but not yet executed */
+bool Decode::check_fu_status_branch(int index)
+{
+	return !(fu_status[fu_enum::BRCH_FU].idx == index && !fu_status[fu_enum::BRCH_FU].executed);
+}
 
 void Decode::cycle()
 {
@@ -71,8 +93,17 @@ void Decode::cycle()
 		break;
 
 	case op_enum::BEQZ:		    /* BEQZ R1 L1 */
+		/* If this branch instruction is already in a functional unit
+		Then halt the further fetching of instructions */
+		if(check_fu_status_branch(i->getIdx()))
+		{
+			RegSet::decode_halt = true;
+			return;
+		}
 		iqe.src_reg1 = i->getop1(); /* R1 */
 		iqe.imm_val = i->getop2();  /* L1 */
+		create_branch_predictor_entry(i->getIdx(), i->getop2());
+		RegSet::pc = branch_predictor[i->getIdx()].get_target_address_index();
 		break;
 
 	case op_enum::HLT: /* HLT */
