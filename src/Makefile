@@ -27,3 +27,7 @@ clean:
 	rm -f ${assembler_out_src} ${simulator_out_src}
 	+make -C assembler clean
 	+make -C simulator clean
+
+results: all
+	grep -i 'data memory' asm/fibonacci.bin.log  -A 1
+	grep -i 'register' asm/factorial.bin.log -A 4 | tail -n4
