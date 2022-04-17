@@ -45,6 +45,7 @@ class RegSet
 public:
 	inline static int pc = 0;
 	inline static instructionPointer ip = {0};
+	inline static bool decode_halt = false;
 
 	/* 16 General Purpose Registers and 17th ax register for (LAX and STX) */
 	inline static int gpr[NUM_REGS + 1] = {0};
