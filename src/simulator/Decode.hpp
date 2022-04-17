@@ -94,10 +94,10 @@ void Decode::cycle()
 
 	case op_enum::BEQZ:		    /* BEQZ R1 L1 */
 		/* If this branch instruction is already in a functional unit
-		Then halt the further fetching of instructions */
+		Then stall the further fetching of instructions */
 		if(check_fu_status_branch(i->getIdx()))
 		{
-			RegSet::decode_halt = true;
+			RegSet::decode_stall = true;
 			return;
 		}
 		iqe.src_reg1 = i->getop1(); /* R1 */
