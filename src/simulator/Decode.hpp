@@ -28,10 +28,10 @@ void Decode::create_branch_predictor_entry(int index, int offset)
 	branch_predictor[index] = BranchPrediction(index, target_address);
 }
 
-/* Check if the given branch instruction is issued but not yet executed */
+/* Check if the given branch instruction is issued */
 bool Decode::check_fu_status_branch(int index)
 {
-	return !(fu_status[fu_enum::BRCH_FU].idx == index && !fu_status[fu_enum::BRCH_FU].executed);
+	return (fu_status[fu_enum::BRCH_FU].idx == index && fu_status[fu_enum::BRCH_FU].busy);
 }
 
 void Decode::cycle()
