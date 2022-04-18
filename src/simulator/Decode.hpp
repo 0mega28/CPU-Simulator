@@ -15,15 +15,16 @@ private:
 	/* Check if the current branch is already issued but not executed
 	If yes, stall the decode until it is executed */
 	bool check_fu_status_branch(int index);
+
 public:
 	void cycle();
 };
 
 void Decode::create_branch_predictor_entry(int index, int offset)
 {
-	if(branch_predictor.find(index) != branch_predictor.end())
+	if (branch_predictor.find(index) != branch_predictor.end())
 		return;
-	int target_address = index + offset/2;
+	int target_address = index + offset / 2;
 
 	branch_predictor[index] = BranchPrediction(index, target_address);
 }
@@ -92,10 +93,12 @@ void Decode::cycle()
 		iqe.src_reg1 = 16;	    /* ax register */
 		break;
 
-	case op_enum::BEQZ:		    /* BEQZ R1 L1 */
-		/* If this branch instruction is already in a functional unit
-		Then stall the further fetching of instructions */
-		if(check_fu_status_branch(i->getIdx()))
+	case op_enum::BEQZ: /* BEQZ R1 L1 */
+		/*
+		 * If this branch instruction is already in a functional unit
+		 * Then stall the further fetching of instructions
+		 */
+		if (check_fu_status_branch(i->getIdx()))
 		{
 			RegSet::decode_stall = true;
 			return;

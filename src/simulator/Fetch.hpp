@@ -22,7 +22,7 @@ Fetch::Fetch(InstructionMemory *instructionMemory)
 
 void Fetch::cycle()
 {
-	if(RegSet::decode_stall)
+	if (RegSet::decode_stall)
 		return;
 	/* Fetch instruction from instruction memory */
 	Instruction *i = instructionMemory->getInstruction(RegSet::pc);
