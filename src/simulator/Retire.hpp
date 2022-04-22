@@ -54,26 +54,20 @@ bool Retire::check_war(fu_enum fu)
 
 		auto &fue_f = fu_status[f];
 
-		/*
-		 * The current instruction to be retired should have higher time
-		 * at which it was issud than an instruction for WAR to be possible.
-		 * Since only busy status of functional unit is reset in our code after
-		 * retiring, so the FU must be busy for WAR to be possible.
-		 */
-		if (fue.time < fue_f.time || !fue_f.busy)
-			continue;
-
 		int fj_f = fue_f.fj;
 		int fk_f = fue_f.fk;
 		int fl_f = fue_f.fl;
 		bool fetched_f = fue_f.fetched;
+		bool rj_f = fue_f.rj;
+		bool rk_f = fue_f.rk;
+		bool rl_f = fue_f.rl;
 
 		/* current fu has to write to some reg */
 		bool is_write = fi != -1;
 		/* dest reg of current fu matches to src reg of some fu */
-		bool war = (fj_f == fi) || (fk_f == fi) || (fl_f == fi);
+		bool war = ((fj_f != fi) || (!rj_f)) && ((fk_f != fi) || (!rk_f)) && ((fl_f != fi) || (!rl_f));
 
-		if (is_write && war && !fetched_f)
+		if (is_write && !war && !fetched_f)
 			return true;
 	}
 	return false;
