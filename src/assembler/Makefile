@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-g -Wall -Werror
 
-C_SRC=assembler.cpp
+C_SRC=assembler.cpp ../utils.cpp
 
 assembler: ${C_SRC}
 	${CC} ${CFLAGS} -o $@ $^

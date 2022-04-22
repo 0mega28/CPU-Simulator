@@ -47,13 +47,6 @@ static std::unordered_map<std::string, std::string> register_map;
 /* List of assembly program's line-by-line instructions */
 static std::vector<std::string> instr_list;
 
-/* Returns binary string of an interger value */
-std::string int_to_bin(int bits, int value)
-{
-	std::bitset<CPU_ARCH> bin(value);
-	return bin.to_string().substr(CPU_ARCH - bits);
-}
-
 void parse_asm_file(std::string asm_f)
 {
 	std::fstream asm_str;
@@ -215,11 +208,11 @@ void translate(std::string bin_file)
 
 				int imm_val = std::stoi(imm.substr(1));
 
-
 				std::string assert_msg = "Error: Line=" + std::to_string(ip + 1) +
 							 ": " + "Immediate value " + imm + " is out of range.";
 				assert_and_exit(imm_val >= MIN_4_BIT_SIGNED &&
-				       imm_val <= MAX_4_BIT_SIGNED, assert_msg);
+						    imm_val <= MAX_4_BIT_SIGNED,
+						assert_msg);
 
 				bin_out = gen_bin_from_instr(opcode, rd,
 							     rs, imm_val);
@@ -295,7 +288,8 @@ void translate(std::string bin_file)
 				std::string assert_msg = "Error: Line=" + std::to_string(ip + 1) +
 							 ": " + "Immediate value " + imm + " is out of range.";
 				assert_and_exit(imm_val >= MIN_12_BIT_SIGNED &&
-				       imm_val <= MAX_12_BIT_SIGNED, assert_msg);
+						    imm_val <= MAX_12_BIT_SIGNED,
+						assert_msg);
 
 				bin_out = opcode_map[opcode] +
 					  int_to_bin(12, imm_val);
