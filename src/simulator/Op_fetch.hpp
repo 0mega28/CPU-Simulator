@@ -25,6 +25,7 @@ bool Op_fetch::read_operands(int fu_index)
 	if (!fue.rj || !fue.rk || !fue.rl)
 		return false;
 
+	// TODO: is it necessary
 	if (fue.fetched)
 		return false; /* Operand already fetched */
 
@@ -35,6 +36,10 @@ bool Op_fetch::read_operands(int fu_index)
 		fue.fk = RegSet::gpr[fue.fk];
 	if (fue.fl != -1)
 		fue.fl = RegSet::gpr[fue.fl];
+
+	fue.rj = false;
+	fue.rk = false;
+	fue.rl = false;
 
 	/* set fetched state to true */
 	fue.fetched = true;
