@@ -30,3 +30,21 @@
 | `JMP L1 `         | `Jump to L1 label `          |
 | `BEQZ R1, L1 `    | `Jump to L1 label if R1 = 0` |
 | `HLT `            | `Halt the computation `      |
+
+## Opcode
+
+| Opcode | bin    |
+| ------ | ------ |
+| `ADD`  | `0000` |
+| `ADDI` | `0001` |
+| `SUB`  | `0010` |
+| `SUBI` | `0011` |
+| `MUL`  | `0100` |
+| `MULI` | `0101` |
+| `LD`   | `0110` |
+| `ST`   | `0111` |
+| `JMP`  | `1000` |
+| `BEQZ` | `1001` |
+| `HLT`  | `1010` |
+| `LAX`  | `1011` |
+| `STX`  | `1100` |
