@@ -178,6 +178,8 @@ void translate(std::string bin_file)
 	std::ofstream bin_strm;
 	bin_strm.open(bin_file);
 
+	bool is_HLT = false;
+
 	for (size_t ip = 0; ip < instr_list.size(); ip++)
 	{
 		std::string instr = instr_list[ip];
@@ -351,9 +353,17 @@ void translate(std::string bin_file)
 			bin_out = opcode_map[opcode];
 			/* Padded for a 16-bit instruction length */
 			bin_out += "000000000000";
+
+			is_HLT = true;
 		}
 
 		bin_strm << bin_out << std::endl;
+	}
+
+	if (!is_HLT) {
+		std::cerr << "End of program not found! Unable to " <<
+			     "assemble binary." << std::endl;
+		exit(EXIT_FAILURE);
 	}
 
 	bin_strm.close();
